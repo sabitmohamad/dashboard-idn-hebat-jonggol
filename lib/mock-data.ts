@@ -1,0 +1,527 @@
+import { getStudent, IDN_STUDENTS } from "./students";
+import type {
+  MenuId,
+  ProgramDashboardData,
+  StudentRank,
+  SummaryDashboardData,
+} from "./types";
+
+function rank(
+  order: { name: string; days: number; school: string }[]
+): StudentRank[] {
+  return order.map((item, i) => {
+    const s = getStudent(item.name);
+    return {
+      rank: i + 1,
+      name: s.name,
+      className: s.className,
+      days: item.days,
+      school: item.school,
+    };
+  });
+}
+
+function spotlightFrom(
+  name: string,
+  opts: {
+    role: string;
+    school: string;
+    flightHours: number;
+    subtitle: string;
+    metricTitle: string;
+    metricUnit: string;
+  }
+) {
+  const s = getStudent(name);
+  return {
+    name: s.name,
+    className: `${s.className} · ${opts.role}`,
+    school: opts.school,
+    flightHours: opts.flightHours,
+    subtitle: opts.subtitle,
+    metricTitle: opts.metricTitle,
+    metricUnit: opts.metricUnit,
+  };
+}
+
+// ─── IDN Lomba ───────────────────────────────────────────────────────────────
+
+export const MOCK_LOMBA: ProgramDashboardData = {
+  kpis: [
+    { id: "kejuaraan", label: "Total Kejuaraan", value: 47, icon: "trophy", accent: "amber" },
+    { id: "emas", label: "Medali Emas", value: 18, icon: "medal", accent: "orange" },
+    { id: "nasional", label: "Tingkat Nasional", value: 12, icon: "flag", accent: "red" },
+    { id: "peserta", label: "Total Peserta", value: 86, icon: "users", accent: "amber" },
+  ],
+  spotlight: spotlightFrom("Rajjah Abqory Yasir", {
+    role: "Robotics",
+    school: "SMP IDN Jonggol",
+    flightHours: 9,
+    subtitle: "Siswa Berprestasi",
+    metricTitle: "Total Medali",
+    metricUnit: "medali",
+  }),
+  leaderboard: rank([
+    { name: "Rajjah Abqory Yasir", days: 9, school: "Gemastik Hackathon" },
+    { name: "Salman Hanan Mufti", days: 7, school: "Olympiad Matematika" },
+    { name: "Utara Wicaksono", days: 6, school: "Cyber Security Competition" },
+    { name: "Abdul Malik Karim Arvinahl", days: 5, school: "Robotics Challenge" },
+    { name: "Ahsan Khalifi Fajriyanto", days: 5, school: "Lomba Web Design" },
+    { name: "Almer Hadyan Raditya Den", days: 4, school: "Gemastik Hackathon" },
+    { name: "Hans Roy Ghaffar", days: 4, school: "Olympiad Matematika" },
+    { name: "Ahmad Syafi Multazam", days: 3, school: "Cyber Security Competition" },
+    { name: "Yandhi Herlambang", days: 3, school: "Robotics Challenge" },
+    { name: "Zidane Fathan Alfarisii", days: 2, school: "Lomba Web Design" },
+  ]),
+  chart: [
+    { name: "Kabupaten", value: 16, color: "#FBBF24" },
+    { name: "Provinsi", value: 14, color: "#F59E0B" },
+    { name: "Nasional", value: 12, color: "#EF4444" },
+    { name: "Internasional", value: 5, color: "#DC2626" },
+  ],
+  chartTitle: "Tingkat Kompetisi",
+  leaderboardTitle: "Leaderboard Perolehan Juara",
+  metricUnit: "medali",
+  sidePanel: {
+    title: "Kejuaraan Terbaru",
+    items: [
+      {
+        title: "Gemastik Hackathon",
+        subtitle: "Rajjah Abqory Yasir · Medali Emas",
+        badge: "Juara 1",
+      },
+      {
+        title: "Olympiad Matematika",
+        subtitle: "Salman Hanan Mufti · Medali Perak",
+        badge: "Juara 2",
+      },
+      {
+        title: "Cyber Security Competition",
+        subtitle: "Utara Wicaksono · Medali Perunggu",
+        badge: "Nasional",
+      },
+      {
+        title: "Robotics Challenge",
+        subtitle: "Abdul Malik Karim Arvinahl · Medali Emas",
+        badge: "Juara 1",
+      },
+    ],
+  },
+};
+
+// ─── IDN Menulis & Sertifikasi ───────────────────────────────────────────────
+
+export const MOCK_MENULIS: ProgramDashboardData = {
+  kpis: [
+    { id: "artikel", label: "Artikel Published", value: 128, icon: "fileText", accent: "emerald" },
+    { id: "sertifikasi", label: "Sertifikasi Terbit", value: 64, icon: "badgeCheck", accent: "mint" },
+    { id: "readers", label: "Reader Count", value: "12.4K", icon: "bookOpen", accent: "green" },
+    { id: "writers", label: "Active Writers", value: 38, icon: "pen", accent: "emerald" },
+  ],
+  spotlight: spotlightFrom("Muhammad Al Ghani Izzaldin", {
+    role: "Content Writer",
+    school: "Portal IDN Media",
+    flightHours: 24,
+    subtitle: "Top Author of the Month",
+    metricTitle: "Artikel Terbit",
+    metricUnit: "artikel",
+  }),
+  leaderboard: rank([
+    { name: "Muhammad Al Ghani Izzaldin", days: 24, school: "Tech & Education" },
+    { name: "Muhammad Fathan Ghifari", days: 19, school: "Religion" },
+    { name: "Khairy Nabihan Elfathin", days: 17, school: "Education" },
+    { name: "Luqman", days: 15, school: "Tech" },
+    { name: "Ahmad Syafi Multazam", days: 14, school: "Lifestyle" },
+    { name: "Hazlam Ibad Athaillah", days: 12, school: "Religion" },
+    { name: "Kenzie Aflah Mulyana", days: 11, school: "Education" },
+    { name: "Rayyan Firdaus Sudais", days: 10, school: "Tech" },
+    { name: "Sabil Tsaqib Hasibuan", days: 9, school: "Opinion" },
+    { name: "Achtarruziq Ali Firnandi", days: 8, school: "Education" },
+  ]),
+  chart: [
+    { name: "Tech", value: 42, color: "#10B981" },
+    { name: "Religion", value: 38, color: "#34D399" },
+    { name: "Education", value: 48, color: "#059669" },
+  ],
+  chartTitle: "Kategori Artikel",
+  leaderboardTitle: "Top Writers",
+  metricUnit: "artikel",
+  sidePanel: {
+    title: "Latest Articles",
+    items: [
+      {
+        title: "Tutorial Next.js 14",
+        subtitle: "Muhammad Al Ghani Izzaldin · 2.1K readers",
+        badge: "Tech",
+      },
+      {
+        title: "Panduan Flutter GetX",
+        subtitle: "Muhammad Fathan Ghifari · 1.8K readers",
+        badge: "Tech",
+      },
+      {
+        title: "Adab Menuntut Ilmu",
+        subtitle: "Khairy Nabihan Elfathin · 1.5K readers",
+        badge: "Religion",
+      },
+      {
+        title: "Menjadi Muslim Technopreneur",
+        subtitle: "Luqman · 1.2K readers",
+        badge: "Education",
+      },
+      {
+        title: "Tips Sertifikasi CCNA",
+        subtitle: "Ahmad Syafi Multazam · 1.1K readers",
+        badge: "Tech",
+      },
+    ],
+  },
+};
+
+// ─── IDN Talking (WET, WTT, Podcast) ─────────────────────────────────────────
+
+export const MOCK_TALKING: ProgramDashboardData = {
+  kpis: [
+    { id: "episode", label: "Total Episode", value: 96, icon: "mic", accent: "purple" },
+    { id: "listeners", label: "Total Listeners/Views", value: "48.2K", icon: "headphones", accent: "pink" },
+    { id: "wet", label: "WET Sessions", value: 32, icon: "radio", accent: "purple" },
+    { id: "wtt", label: "WTT Sessions", value: 28, icon: "video", accent: "pink" },
+  ],
+  spotlight: spotlightFrom("Almer Hadyan Raditya Den", {
+    role: "Public Speaking",
+    school: "IDN Podcast Studio",
+    flightHours: 22,
+    subtitle: "Top Speaker / Presenter",
+    metricTitle: "Episode Hosted",
+    metricUnit: "episode",
+  }),
+  leaderboard: rank([
+    { name: "Almer Hadyan Raditya Den", days: 22, school: "Podcast Host" },
+    { name: "Ahsan Khalifi Fajriyanto", days: 18, school: "WET Moderator" },
+    { name: "Hans Roy Ghaffar", days: 16, school: "WTT Speaker" },
+    { name: "Yandhi Herlambang", days: 14, school: "Podcast Guest" },
+    { name: "Zidane Fathan Alfarisii", days: 13, school: "WET Panelist" },
+    { name: "Rajjah Abqory Yasir", days: 12, school: "YouTube Host" },
+    { name: "Salman Hanan Mufti", days: 11, school: "WTT Coach" },
+    { name: "Utara Wicaksono", days: 10, school: "Podcast Editor" },
+    { name: "Ahmad Husein", days: 9, school: "WET Speaker" },
+    { name: "Kenzie Aflah Mulyana", days: 8, school: "School Audio" },
+  ]),
+  chart: [
+    { name: "Spotify", value: 38, color: "#A855F7" },
+    { name: "YouTube", value: 42, color: "#EC4899" },
+    { name: "School Audio", value: 20, color: "#C084FC" },
+  ],
+  chartTitle: "Platform Breakdown",
+  leaderboardTitle: "Top Speakers / Presenters",
+  metricUnit: "episode",
+  sidePanel: {
+    title: "Episode Highlights",
+    items: [
+      {
+        title: "Weekly English Talk: AI in Future",
+        subtitle: "Almer Hadyan Raditya Den · 4.2K views",
+        badge: "WET",
+      },
+      {
+        title: "Weekly Tech Talk: Laravel Sanctum",
+        subtitle: "Hans Roy Ghaffar · 3.8K views",
+        badge: "WTT",
+      },
+      {
+        title: "Podcast Santri Tech",
+        subtitle: "Ahsan Khalifi Fajriyanto · 3.1K listens",
+        badge: "Podcast",
+      },
+      {
+        title: "Weekly English Talk: Soft Skills",
+        subtitle: "Yandhi Herlambang · 2.4K views",
+        badge: "WET",
+      },
+    ],
+  },
+};
+
+// ─── IDN Karakter ────────────────────────────────────────────────────────────
+
+export const MOCK_KARAKTER: ProgramDashboardData = {
+  kpis: [
+    { id: "disiplin", label: "Skor Kedisiplinan Avg", value: 97, icon: "target", accent: "teal" },
+    { id: "poin", label: "Poin Kebaikan", value: "2.8K", icon: "heart", accent: "green" },
+    { id: "kebaikan", label: "Catatan Kebaikan", value: 214, icon: "smile", accent: "teal" },
+    { id: "awards", label: "Awards", value: 36, icon: "award", accent: "mint" },
+  ],
+  spotlight: spotlightFrom("Ahmad Syafi Multazam", {
+    role: "Ketua Kelas",
+    school: "Asrama Putra · Blok C",
+    flightHours: 980,
+    subtitle: "Siswa Teladan",
+    metricTitle: "Poin Kebaikan",
+    metricUnit: "poin",
+  }),
+  leaderboard: rank([
+    { name: "Ahmad Syafi Multazam", days: 100, school: "Santri Teladan · Skor 100" },
+    { name: "Hazlam Ibad Athaillah", days: 99, school: "Best Cleanliness · Skor 99" },
+    { name: "Sabil Tsaqib Hasibuan", days: 98, school: "Santri Teladan · Skor 98" },
+    { name: "Rayyan Firdaus Sudais", days: 98, school: "Best Cleanliness · Skor 98" },
+    { name: "Achtarruziq Ali Firnandi", days: 97, school: "Santri Teladan · Skor 97" },
+    { name: "Ahmad Husein", days: 97, school: "Poin Kebaikan · Skor 97" },
+    { name: "Kenzie Aflah Mulyana", days: 96, school: "Best Cleanliness · Skor 96" },
+    { name: "Khairy Nabihan Elfathin", days: 96, school: "Santri Teladan · Skor 96" },
+    { name: "Luqman", days: 95, school: "Poin Kebaikan · Skor 95" },
+    { name: "Muhammad Fathan Ghifari", days: 95, school: "Best Cleanliness · Skor 95" },
+  ]),
+  chart: [
+    { name: "Ibadah", value: 28, color: "#14B8A6" },
+    { name: "Kedisiplinan", value: 32, color: "#059669" },
+    { name: "Kebersihan", value: 22, color: "#2DD4BF" },
+    { name: "Kemandirian", value: 18, color: "#10B981" },
+  ],
+  chartTitle: "Aspek Karakter",
+  leaderboardTitle: "Leaderboard Kedisiplinan & Poin Kebaikan",
+  metricUnit: "skor",
+  sidePanel: {
+    title: "Catatan Teladan",
+    items: [
+      {
+        title: "Santri Teladan",
+        subtitle: "Ahmad Syafi Multazam · Skor Kedisiplinan 100",
+        badge: "Teladan",
+      },
+      {
+        title: "Best Cleanliness",
+        subtitle: "Hazlam Ibad Athaillah · Blok A",
+        badge: "Bersih",
+      },
+      {
+        title: "Poin Kebaikan Tertinggi",
+        subtitle: "Sabil Tsaqib Hasibuan · Minggu ini",
+        badge: "Peduli",
+      },
+      {
+        title: "Santri Teladan",
+        subtitle: "Rayyan Firdaus Sudais · Skor 98",
+        badge: "Disiplin",
+      },
+    ],
+  },
+};
+
+// ─── IDN Tahfidz ─────────────────────────────────────────────────────────────
+
+export const MOCK_TAHFIDZ: ProgramDashboardData = {
+  kpis: [
+    { id: "juz", label: "Total Juz Terhafal", value: 312, icon: "book", accent: "royal" },
+    { id: "mutqin", label: "Mutqin Target", value: 48, icon: "target", accent: "violet" },
+    { id: "setoran", label: "Setoran Bulan Ini", value: 186, icon: "scroll", accent: "royal" },
+    { id: "mumtaz", label: "Santri Mumtaz", value: 22, icon: "sparkles", accent: "violet" },
+  ],
+  spotlight: spotlightFrom("Muhammad Fathan Ghifari", {
+    role: "Halaqah Al-Falah",
+    school: "SMP IDN Jonggol",
+    flightHours: 30,
+    subtitle: "Santri Mumtaz",
+    metricTitle: "Juz Terhafal",
+    metricUnit: "juz",
+  }),
+  leaderboard: rank([
+    { name: "Muhammad Fathan Ghifari", days: 30, school: "30 Juz Mutqin · Mumtaz" },
+    { name: "Muhammad Al Ghani Izzaldin", days: 10, school: "10 Juz · Mumtaz" },
+    { name: "Ahmad Syafi Multazam", days: 5, school: "5 Juz · Jayyid Jiddan" },
+    { name: "Hans Roy Ghaffar", days: 5, school: "5 Juz · Mumtaz" },
+    { name: "Rajjah Abqory Yasir", days: 3, school: "3 Juz · Jayyid Jiddan" },
+    { name: "Salman Hanan Mufti", days: 3, school: "3 Juz · Mumtaz" },
+    { name: "Abdul Malik Karim Arvinahl", days: 3, school: "3 Juz · Jayyid Jiddan" },
+    { name: "Hazlam Ibad Athaillah", days: 3, school: "3 Juz · Mumtaz" },
+    { name: "Khairy Nabihan Elfathin", days: 3, school: "3 Juz · Jayyid Jiddan" },
+    { name: "Luqman", days: 3, school: "3 Juz · Mumtaz" },
+  ]),
+  chart: [
+    { name: "Lancar", value: 45, color: "#2563EB" },
+    { name: "Ziyadah", value: 32, color: "#7C3AED" },
+    { name: "Muraja'ah", value: 23, color: "#8B5CF6" },
+  ],
+  chartTitle: "Status Hafalan",
+  leaderboardTitle: "Leaderboard Hafalan Santri",
+  metricUnit: "juz",
+  sidePanel: {
+    title: "Setoran Terbaru",
+    items: [
+      {
+        title: "30 Juz Mutqin",
+        subtitle: "Muhammad Fathan Ghifari · Predikat Mumtaz",
+        badge: "Mutqin",
+      },
+      {
+        title: "10 Juz Terhafal",
+        subtitle: "Muhammad Al Ghani Izzaldin · Mumtaz",
+        badge: "Mumtaz",
+      },
+      {
+        title: "5 Juz · Ziyadah",
+        subtitle: "Ahmad Syafi Multazam · Jayyid Jiddan",
+        badge: "Jayyid",
+      },
+      {
+        title: "3 Juz · Muraja'ah",
+        subtitle: "Hans Roy Ghaffar · Halaqah pagi",
+        badge: "Review",
+      },
+    ],
+  },
+};
+
+// ─── Summary ─────────────────────────────────────────────────────────────────
+
+export const MOCK_SUMMARY: SummaryDashboardData = {
+  stats: [
+    {
+      id: "prestasi",
+      label: "Total Prestasi Lomba",
+      value: 47,
+      program: "lomba",
+      description: "Kejuaraan aktif — dipimpin Rajjah Abqory Yasir",
+    },
+    {
+      id: "jam-mengajar",
+      label: "Total Jam Mengajar",
+      value: 156,
+      program: "mengajar",
+      description: "Hari mengajar di sekolah mitra",
+    },
+    {
+      id: "hafalan",
+      label: "Total Hafalan",
+      value: 312,
+      program: "tahfidz",
+      description: "Akumulasi juz — Muhammad Fathan Ghifari 30 Juz Mutqin",
+    },
+    {
+      id: "artikel",
+      label: "Total Artikel",
+      value: 128,
+      program: "menulis",
+      description: "Top writer: Muhammad Al Ghani Izzaldin",
+    },
+    {
+      id: "episode",
+      label: "Total Episode Talking",
+      value: 96,
+      program: "talking",
+      description: "Top speaker: Almer Hadyan Raditya Den",
+    },
+    {
+      id: "karakter",
+      label: "Siswa Teladan",
+      value: 36,
+      program: "karakter",
+      description: "Ahmad Syafi Multazam — skor kedisiplinan 100",
+    },
+  ],
+  highlights: [
+    {
+      id: "h1",
+      program: "IDN Lomba",
+      title: "Rajjah · Medali Emas",
+      value: "18",
+      accent: "amber",
+    },
+    {
+      id: "h2",
+      program: "IDN Menulis",
+      title: "Al Ghani · Top Writer",
+      value: "24",
+      accent: "emerald",
+    },
+    {
+      id: "h3",
+      program: "IDN Tahfidz",
+      title: "Fathan · 30 Juz Mutqin",
+      value: "Mumtaz",
+      accent: "violet",
+    },
+    {
+      id: "h4",
+      program: "IDN Talking",
+      title: "Almer · Top Speaker",
+      value: "22",
+      accent: "pink",
+    },
+  ],
+  topPerformers: [
+    {
+      id: "tp1",
+      name: "Rajjah Abqory Yasir",
+      className: getStudent("Rajjah Abqory Yasir").className,
+      categories: ["Lomba", "Talking"],
+      highlight: "Siswa Berprestasi · Gemastik Hackathon (Medali Emas)",
+    },
+    {
+      id: "tp2",
+      name: "Muhammad Fathan Ghifari",
+      className: getStudent("Muhammad Fathan Ghifari").className,
+      categories: ["Tahfidz", "Menulis"],
+      highlight: "30 Juz Mutqin · Predikat Mumtaz",
+    },
+    {
+      id: "tp3",
+      name: "Ahmad Syafi Multazam",
+      className: getStudent("Ahmad Syafi Multazam").className,
+      categories: ["Karakter", "Tahfidz", "Menulis"],
+      highlight: "Santri Teladan · Skor Kedisiplinan 100",
+    },
+    {
+      id: "tp4",
+      name: "Almer Hadyan Raditya Den",
+      className: getStudent("Almer Hadyan Raditya Den").className,
+      categories: ["Talking", "Lomba"],
+      highlight: "Top Speaker · Weekly English Talk: AI in Future",
+    },
+    {
+      id: "tp5",
+      name: "Muhammad Al Ghani Izzaldin",
+      className: getStudent("Muhammad Al Ghani Izzaldin").className,
+      categories: ["Menulis", "Tahfidz"],
+      highlight: "Top Writer · Tutorial Next.js 14 · 10 Juz Mumtaz",
+    },
+    {
+      id: "tp6",
+      name: "Hazlam Ibad Athaillah",
+      className: getStudent("Hazlam Ibad Athaillah").className,
+      categories: ["Karakter", "Tahfidz"],
+      highlight: "Best Cleanliness · Skor Kedisiplinan 99",
+    },
+  ],
+};
+
+export const PROGRAM_MOCK_MAP: Record<
+  Exclude<MenuId, "summary" | "mengajar">,
+  ProgramDashboardData
+> = {
+  lomba: MOCK_LOMBA,
+  menulis: MOCK_MENULIS,
+  talking: MOCK_TALKING,
+  karakter: MOCK_KARAKTER,
+  tahfidz: MOCK_TAHFIDZ,
+};
+
+export function getProgramMock(
+  menuId: Exclude<MenuId, "summary" | "mengajar">
+): ProgramDashboardData {
+  return PROGRAM_MOCK_MAP[menuId];
+}
+
+/** Sheet tab candidates per menu (tried in order by the API / client). */
+export const SHEET_TAB_CANDIDATES: Record<MenuId, string[]> = {
+  summary: ["Data Siswa", "Data_Siswa", "Summary"],
+  mengajar: ["IDN Mengajar", "Mengajar", "Data Siswa", "Data_Siswa", "Sheet1"],
+  // Program tabs that are aggregate-only (no Nama) fall back to mock in mapSheetsToProgram.
+  // Do not use Data Siswa as a silent stand-in for program leaderboards.
+  lomba: ["IDN Lomba", "Lomba"],
+  menulis: ["IDN Menulis dan Sertifikasi", "IDN Menulis", "Menulis"],
+  talking: ["IDN Talking", "Talking"],
+  karakter: ["IDN Karakter", "Karakter"],
+  tahfidz: ["IDN Tahfidz", "Tahfidz"],
+};
+
+export { IDN_STUDENTS };
