@@ -162,3 +162,23 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Custom thin scrollbar for Lomba leaderboard / right column */
+.lomba-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 158, 11, 0.45) rgba(15, 23, 42, 0.6);
+}
+.lomba-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.lomba-scroll::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 999px;
+}
+.lomba-scroll::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.45);
+  border-radius: 999px;
+}
+.lomba-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.7);
+}

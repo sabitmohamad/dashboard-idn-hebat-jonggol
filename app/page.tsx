@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { Header } from "@/components/Header";
 import { IdnMengajarView } from "@/components/IdnMengajarView";
+import { IdnLombaView } from "@/components/lomba/IdnLombaView";
 import { ProgramView } from "@/components/ProgramView";
 import { SummaryView } from "@/components/SummaryView";
 import {
@@ -19,9 +20,11 @@ import {
 } from "@/lib/mock-data";
 import { NAV_ITEMS } from "@/lib/nav";
 import { getTheme, themeCssVars } from "@/lib/themes";
+import type { LombaItem } from "@/src/data/mockLomba";
+import { MOCK_LOMBA_DATA } from "@/src/data/mockLomba";
 import type { MengajarDashboardData, MenuId, SheetRow } from "@/lib/types";
 
-type ProgramMenuId = Exclude<MenuId, "summary" | "mengajar">;
+type ProgramMenuId = Exclude<MenuId, "summary" | "mengajar" | "lomba">;
 
 const TV_SLIDE_MS = 10_000;
 const TV_SLIDE_SECONDS = TV_SLIDE_MS / 1000;
@@ -64,6 +67,11 @@ export default function HomePage() {
   const [mengajarData, setMengajarData] =
     useState<MengajarDashboardData>(FALLBACK_MENGAJAR_DATA);
   const [error, setError] = useState<string | null>(null);
+  const [lombaData, setLombaData] = useState<LombaItem[]>(MOCK_LOMBA_DATA);
+  const [lombaLoading, setLombaLoading] = useState(true);
+  const [lombaError, setLombaError] = useState<string | null>(null);
+  const [lombaConnected, setLombaConnected] = useState(false);
+  const [lombaSheet, setLombaSheet] = useState<string | null>(null);
   const [tvMode, setTvMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [slideProgress, setSlideProgress] = useState(0);
@@ -94,6 +102,47 @@ export default function HomePage() {
     }
 
     loadMengajar();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadLomba() {
+      setLombaLoading(true);
+      setLombaError(null);
+      try {
+        const res = await fetch("/api/lomba", { cache: "no-store" });
+        const json = await res.json();
+        if (cancelled) return;
+
+        const rows = (json.data ?? []) as LombaItem[];
+        setLombaData(rows.length > 0 ? rows : MOCK_LOMBA_DATA);
+        setLombaConnected(Boolean(json.connected));
+        setLombaSheet((json.sheet as string | null) ?? null);
+
+        if (!json.connected && json.message) {
+          setLombaError(String(json.message));
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setLombaError(
+            err instanceof Error
+              ? err.message
+              : "Gagal memuat data IDN Lomba"
+          );
+          setLombaData(MOCK_LOMBA_DATA);
+          setLombaConnected(false);
+          setLombaSheet(null);
+        }
+      } finally {
+        if (!cancelled) setLombaLoading(false);
+      }
+    }
+
+    loadLomba();
     return () => {
       cancelled = true;
     };
@@ -183,14 +232,17 @@ export default function HomePage() {
 
   const theme = getTheme(activeMenu);
   const showLiveBadge =
-    activeMenu === "mengajar" && mengajarData.connected && !error;
+    (activeMenu === "mengajar" && mengajarData.connected && !error) ||
+    (activeMenu === "lomba" && lombaConnected && !lombaError);
 
   const isProgramMenu =
-    activeMenu !== "summary" && activeMenu !== "mengajar";
+    activeMenu !== "summary" &&
+    activeMenu !== "mengajar" &&
+    activeMenu !== "lomba";
 
   return (
     <div
-      className="dashboard-bg min-h-screen pb-28 text-white"
+      className="dashboard-bg min-h-screen pb-8 text-white"
       data-theme={activeMenu}
       style={themeCssVars(theme)}
     >
@@ -228,7 +280,8 @@ export default function HomePage() {
           </div>
         )}
 
-        {loading && activeMenu === "mengajar" ? (
+        {(loading && activeMenu === "mengajar") ||
+        (lombaLoading && activeMenu === "lomba") ? (
           <DashboardSkeleton />
         ) : (
           <AnimatePresence mode="wait">
@@ -243,6 +296,14 @@ export default function HomePage() {
                 <SummaryView data={MOCK_SUMMARY} />
               ) : activeMenu === "mengajar" ? (
                 <IdnMengajarView data={mengajarData} />
+              ) : activeMenu === "lomba" ? (
+                <IdnLombaView
+                  data={lombaData}
+                  connected={lombaConnected}
+                  sheet={lombaSheet}
+                  isLoading={false}
+                  error={lombaError}
+                />
               ) : (
                 <ProgramView
                   data={getProgramMock(activeMenu as ProgramMenuId)}
