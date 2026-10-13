@@ -242,135 +242,6 @@ export const MOCK_TALKING: ProgramDashboardData = {
   },
 };
 
-// ─── IDN Karakter ────────────────────────────────────────────────────────────
-
-export const MOCK_KARAKTER: ProgramDashboardData = {
-  kpis: [
-    { id: "disiplin", label: "Skor Kedisiplinan Avg", value: 97, icon: "target", accent: "teal" },
-    { id: "poin", label: "Poin Kebaikan", value: "2.8K", icon: "heart", accent: "green" },
-    { id: "kebaikan", label: "Catatan Kebaikan", value: 214, icon: "smile", accent: "teal" },
-    { id: "awards", label: "Awards", value: 36, icon: "award", accent: "mint" },
-  ],
-  spotlight: spotlightFrom("Ahmad Syafi Multazam", {
-    role: "Ketua Kelas",
-    school: "Asrama Putra · Blok C",
-    flightHours: 980,
-    subtitle: "Siswa Teladan",
-    metricTitle: "Poin Kebaikan",
-    metricUnit: "poin",
-  }),
-  leaderboard: rank([
-    { name: "Ahmad Syafi Multazam", days: 100, school: "Santri Teladan · Skor 100" },
-    { name: "Hazlam Ibad Athaillah", days: 99, school: "Best Cleanliness · Skor 99" },
-    { name: "Sabil Tsaqib Hasibuan", days: 98, school: "Santri Teladan · Skor 98" },
-    { name: "Rayyan Firdaus Sudais", days: 98, school: "Best Cleanliness · Skor 98" },
-    { name: "Achtarruziq Ali Firnandi", days: 97, school: "Santri Teladan · Skor 97" },
-    { name: "Ahmad Husein", days: 97, school: "Poin Kebaikan · Skor 97" },
-    { name: "Kenzie Aflah Mulyana", days: 96, school: "Best Cleanliness · Skor 96" },
-    { name: "Khairy Nabihan Elfathin", days: 96, school: "Santri Teladan · Skor 96" },
-    { name: "Luqman", days: 95, school: "Poin Kebaikan · Skor 95" },
-    { name: "Muhammad Fathan Ghifari", days: 95, school: "Best Cleanliness · Skor 95" },
-  ]),
-  chart: [
-    { name: "Ibadah", value: 28, color: "#14B8A6" },
-    { name: "Kedisiplinan", value: 32, color: "#059669" },
-    { name: "Kebersihan", value: 22, color: "#2DD4BF" },
-    { name: "Kemandirian", value: 18, color: "#10B981" },
-  ],
-  chartTitle: "Aspek Karakter",
-  leaderboardTitle: "Leaderboard Kedisiplinan & Poin Kebaikan",
-  metricUnit: "skor",
-  sidePanel: {
-    title: "Catatan Teladan",
-    items: [
-      {
-        title: "Santri Teladan",
-        subtitle: "Ahmad Syafi Multazam · Skor Kedisiplinan 100",
-        badge: "Teladan",
-      },
-      {
-        title: "Best Cleanliness",
-        subtitle: "Hazlam Ibad Athaillah · Blok A",
-        badge: "Bersih",
-      },
-      {
-        title: "Poin Kebaikan Tertinggi",
-        subtitle: "Sabil Tsaqib Hasibuan · Minggu ini",
-        badge: "Peduli",
-      },
-      {
-        title: "Santri Teladan",
-        subtitle: "Rayyan Firdaus Sudais · Skor 98",
-        badge: "Disiplin",
-      },
-    ],
-  },
-};
-
-// ─── IDN Tahfidz ─────────────────────────────────────────────────────────────
-
-export const MOCK_TAHFIDZ: ProgramDashboardData = {
-  kpis: [
-    { id: "juz", label: "Total Juz Terhafal", value: 312, icon: "book", accent: "royal" },
-    { id: "mutqin", label: "Mutqin Target", value: 48, icon: "target", accent: "violet" },
-    { id: "setoran", label: "Setoran Bulan Ini", value: 186, icon: "scroll", accent: "royal" },
-    { id: "mumtaz", label: "Santri Mumtaz", value: 22, icon: "sparkles", accent: "violet" },
-  ],
-  spotlight: spotlightFrom("Muhammad Fathan Ghifari", {
-    role: "Halaqah Al-Falah",
-    school: "SMP IDN Jonggol",
-    flightHours: 30,
-    subtitle: "Santri Mumtaz",
-    metricTitle: "Juz Terhafal",
-    metricUnit: "juz",
-  }),
-  leaderboard: rank([
-    { name: "Muhammad Fathan Ghifari", days: 30, school: "30 Juz Mutqin · Mumtaz" },
-    { name: "Muhammad Al Ghani Izzaldin", days: 10, school: "10 Juz · Mumtaz" },
-    { name: "Ahmad Syafi Multazam", days: 5, school: "5 Juz · Jayyid Jiddan" },
-    { name: "Hans Roy Ghaffar", days: 5, school: "5 Juz · Mumtaz" },
-    { name: "Rajjah Abqory Yasir", days: 3, school: "3 Juz · Jayyid Jiddan" },
-    { name: "Salman Hanan Mufti", days: 3, school: "3 Juz · Mumtaz" },
-    { name: "Abdul Malik Karim Arvinahl", days: 3, school: "3 Juz · Jayyid Jiddan" },
-    { name: "Hazlam Ibad Athaillah", days: 3, school: "3 Juz · Mumtaz" },
-    { name: "Khairy Nabihan Elfathin", days: 3, school: "3 Juz · Jayyid Jiddan" },
-    { name: "Luqman", days: 3, school: "3 Juz · Mumtaz" },
-  ]),
-  chart: [
-    { name: "Lancar", value: 45, color: "#2563EB" },
-    { name: "Ziyadah", value: 32, color: "#7C3AED" },
-    { name: "Muraja'ah", value: 23, color: "#8B5CF6" },
-  ],
-  chartTitle: "Status Hafalan",
-  leaderboardTitle: "Leaderboard Hafalan Santri",
-  metricUnit: "juz",
-  sidePanel: {
-    title: "Setoran Terbaru",
-    items: [
-      {
-        title: "30 Juz Mutqin",
-        subtitle: "Muhammad Fathan Ghifari · Predikat Mumtaz",
-        badge: "Mutqin",
-      },
-      {
-        title: "10 Juz Terhafal",
-        subtitle: "Muhammad Al Ghani Izzaldin · Mumtaz",
-        badge: "Mumtaz",
-      },
-      {
-        title: "5 Juz · Ziyadah",
-        subtitle: "Ahmad Syafi Multazam · Jayyid Jiddan",
-        badge: "Jayyid",
-      },
-      {
-        title: "3 Juz · Muraja'ah",
-        subtitle: "Hans Roy Ghaffar · Halaqah pagi",
-        badge: "Review",
-      },
-    ],
-  },
-};
-
 // ─── Summary ─────────────────────────────────────────────────────────────────
 
 export const MOCK_SUMMARY: SummaryDashboardData = {
@@ -378,23 +249,16 @@ export const MOCK_SUMMARY: SummaryDashboardData = {
     {
       id: "prestasi",
       label: "Total Prestasi Lomba",
-      value: 47,
+      value: 0,
       program: "lomba",
-      description: "Kejuaraan aktif — dipimpin Rajjah Abqory Yasir",
+      description: "Memuat data IDN Lomba…",
     },
     {
       id: "jam-mengajar",
-      label: "Total Jam Mengajar",
+      label: "Total Hari Mengajar",
       value: 156,
       program: "mengajar",
       description: "Hari mengajar di sekolah mitra",
-    },
-    {
-      id: "hafalan",
-      label: "Total Hafalan",
-      value: 312,
-      program: "tahfidz",
-      description: "Akumulasi juz — Muhammad Fathan Ghifari 30 Juz Mutqin",
     },
     {
       id: "artikel",
@@ -411,19 +275,19 @@ export const MOCK_SUMMARY: SummaryDashboardData = {
       description: "Top speaker: Almer Hadyan Raditya Den",
     },
     {
-      id: "karakter",
-      label: "Siswa Teladan",
-      value: 36,
-      program: "karakter",
-      description: "Ahmad Syafi Multazam — skor kedisiplinan 100",
+      id: "seminar",
+      label: "Rata-rata Ketercapaian Seminar",
+      value: "75%",
+      program: "seminar",
+      description: "WET, WTT, dan Podcast per pekan",
     },
   ],
   highlights: [
     {
       id: "h1",
       program: "IDN Lomba",
-      title: "Rajjah · Medali Emas",
-      value: "18",
+      title: "Top Juara",
+      value: "0",
       accent: "amber",
     },
     {
@@ -435,10 +299,10 @@ export const MOCK_SUMMARY: SummaryDashboardData = {
     },
     {
       id: "h3",
-      program: "IDN Tahfidz",
-      title: "Fathan · 30 Juz Mutqin",
-      value: "Mumtaz",
-      accent: "violet",
+      program: "IDN Mengajar",
+      title: "Total Hari Mengajar",
+      value: "156",
+      accent: "cyan",
     },
     {
       id: "h4",
@@ -453,60 +317,58 @@ export const MOCK_SUMMARY: SummaryDashboardData = {
       id: "tp1",
       name: "Rajjah Abqory Yasir",
       className: getStudent("Rajjah Abqory Yasir").className,
-      categories: ["Lomba", "Talking"],
-      highlight: "Siswa Berprestasi · Gemastik Hackathon (Medali Emas)",
+      categories: ["Talking"],
+      highlight: "YouTube Host · IDN Talking",
     },
     {
       id: "tp2",
       name: "Muhammad Fathan Ghifari",
       className: getStudent("Muhammad Fathan Ghifari").className,
-      categories: ["Tahfidz", "Menulis"],
-      highlight: "30 Juz Mutqin · Predikat Mumtaz",
+      categories: ["Menulis"],
+      highlight: "Panduan Flutter GetX · 1.8K readers",
     },
     {
       id: "tp3",
       name: "Ahmad Syafi Multazam",
       className: getStudent("Ahmad Syafi Multazam").className,
-      categories: ["Karakter", "Tahfidz", "Menulis"],
-      highlight: "Santri Teladan · Skor Kedisiplinan 100",
+      categories: ["Menulis"],
+      highlight: "Tips Sertifikasi CCNA · Lifestyle",
     },
     {
       id: "tp4",
       name: "Almer Hadyan Raditya Den",
       className: getStudent("Almer Hadyan Raditya Den").className,
-      categories: ["Talking", "Lomba"],
+      categories: ["Talking"],
       highlight: "Top Speaker · Weekly English Talk: AI in Future",
     },
     {
       id: "tp5",
       name: "Muhammad Al Ghani Izzaldin",
       className: getStudent("Muhammad Al Ghani Izzaldin").className,
-      categories: ["Menulis", "Tahfidz"],
-      highlight: "Top Writer · Tutorial Next.js 14 · 10 Juz Mumtaz",
+      categories: ["Menulis"],
+      highlight: "Top Writer · Tutorial Next.js 14",
     },
     {
       id: "tp6",
       name: "Hazlam Ibad Athaillah",
       className: getStudent("Hazlam Ibad Athaillah").className,
-      categories: ["Karakter", "Tahfidz"],
-      highlight: "Best Cleanliness · Skor Kedisiplinan 99",
+      categories: ["Menulis"],
+      highlight: "12 artikel Religion · Active Writer",
     },
   ],
 };
 
 export const PROGRAM_MOCK_MAP: Record<
-  Exclude<MenuId, "summary" | "mengajar">,
+  Exclude<MenuId, "summary" | "mengajar" | "tabungan" | "seminar">,
   ProgramDashboardData
 > = {
   lomba: MOCK_LOMBA,
   menulis: MOCK_MENULIS,
   talking: MOCK_TALKING,
-  karakter: MOCK_KARAKTER,
-  tahfidz: MOCK_TAHFIDZ,
 };
 
 export function getProgramMock(
-  menuId: Exclude<MenuId, "summary" | "mengajar">
+  menuId: Exclude<MenuId, "summary" | "mengajar" | "tabungan" | "seminar">
 ): ProgramDashboardData {
   return PROGRAM_MOCK_MAP[menuId];
 }
@@ -518,10 +380,17 @@ export const SHEET_TAB_CANDIDATES: Record<MenuId, string[]> = {
   // Program tabs that are aggregate-only (no Nama) fall back to mock in mapSheetsToProgram.
   // Do not use Data Siswa as a silent stand-in for program leaderboards.
   lomba: ["IDN Lomba", "Lomba"],
-  menulis: ["IDN Menulis dan Sertifikasi", "IDN Menulis", "Menulis"],
-  talking: ["IDN Talking", "Talking"],
-  karakter: ["IDN Karakter", "Karakter"],
-  tahfidz: ["IDN Tahfidz", "Tahfidz"],
+  menulis: [
+    "Menulis_Sertifikasi_Report",
+    "Menulis_Log",
+    "Sertifikasi_Log",
+    "IDN Menulis dan Sertifikasi",
+    "IDN Menulis",
+    "Menulis",
+  ],
+  talking: ["Talking_Log", "IDN Talking", "Talking"],
+  tabungan: ["Tabungan_Log", "Data_Tabungan", "Tabungan", "Tabungan Siswa"],
+  seminar: ["Seminar_Report"],
 };
 
 export { IDN_STUDENTS };

@@ -1,59 +1,63 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { Header } from "@/components/Header";
-import { IdnMengajarView } from "@/components/IdnMengajarView";
 import { IdnLombaView } from "@/components/lomba/IdnLombaView";
-import { ProgramView } from "@/components/ProgramView";
+import { IdnMengajarDashboard } from "@/components/mengajar/IdnMengajarDashboard";
+import { IdnMenulisDashboard } from "@/components/menulis/IdnMenulisDashboard";
+import { IdnSeminarDashboard } from "@/components/seminar/IdnSeminarDashboard";
+import { IdnTabunganDashboard } from "@/components/tabungan/IdnTabunganDashboard";
+import { IdnTalkingDashboard } from "@/components/talking/IdnTalkingDashboard";
 import { SummaryView } from "@/components/SummaryView";
 import {
-  FALLBACK_MENGAJAR_DATA,
-  mapSheetsToMengajar,
-} from "@/lib/map-sheets";
+  buildMengajarLeaderboard,
+  computeMengajarStats,
+} from "@/lib/mengajar";
 import {
-  getProgramMock,
-  MOCK_SUMMARY,
-  SHEET_TAB_CANDIDATES,
-} from "@/lib/mock-data";
+  bestAchievementFor,
+  buildLeaderboard,
+  computeLombaStats,
+  getSpotlightStudent,
+  groupLombaByStatus,
+} from "@/lib/lomba";
+import { computeMenulisStats, formatNum, formatPct } from "@/lib/menulis";
+import { computeSeminarStats, formatPct as formatSeminarPct } from "@/lib/seminar";
+import { MOCK_SUMMARY } from "@/lib/mock-data";
 import { NAV_ITEMS } from "@/lib/nav";
 import { getTheme, themeCssVars } from "@/lib/themes";
 import type { LombaItem } from "@/src/data/mockLomba";
 import { MOCK_LOMBA_DATA } from "@/src/data/mockLomba";
-import type { MengajarDashboardData, MenuId, SheetRow } from "@/lib/types";
-
-type ProgramMenuId = Exclude<MenuId, "summary" | "mengajar" | "lomba">;
+import {
+  MOCK_MENGAJAR_PAYLOAD,
+  type MengajarPayload,
+} from "@/src/data/mockMengajar";
+import {
+  MOCK_MENULIS_PAYLOAD,
+  type MenulisPayload,
+} from "@/src/data/mockMenulis";
+import {
+  MOCK_TALKING_PAYLOAD,
+  type TalkingPayload,
+} from "@/src/data/mockTalking";
+import {
+  MOCK_SEMINAR_PAYLOAD,
+  type SeminarPayload,
+} from "@/src/data/mockSeminar";
+import {
+  EMPTY_TABUNGAN_PAYLOAD,
+  type TabunganPayload,
+} from "@/src/data/tabungan";
+import type {
+  MenuId,
+  SummaryDashboardData,
+  SummaryTopPerformer,
+} from "@/lib/types";
 
 const TV_SLIDE_MS = 10_000;
 const TV_SLIDE_SECONDS = TV_SLIDE_MS / 1000;
-
-async function fetchSheetRows(
-  tabCandidates: string[]
-): Promise<{ rows: SheetRow[]; sheet: string | null } | null> {
-  for (const tab of tabCandidates) {
-    try {
-      const res = await fetch(`/api/sheets?tab=${encodeURIComponent(tab)}`);
-      const json = await res.json();
-
-      if (!res.ok) {
-        if (res.status === 404) continue;
-        throw new Error(json.error || json.message || "Gagal memuat data");
-      }
-
-      const rows = (json.data ?? []) as SheetRow[];
-      if (rows.length > 0) {
-        return { rows, sheet: (json.sheet as string) ?? tab };
-      }
-    } catch (err) {
-      if (err instanceof Error && !err.message.includes("404")) {
-        throw err;
-      }
-    }
-  }
-  return null;
-}
 
 function nextMenuId(current: MenuId): MenuId {
   const idx = NAV_ITEMS.findIndex((item) => item.id === current);
@@ -61,17 +65,176 @@ function nextMenuId(current: MenuId): MenuId {
   return next.id;
 }
 
+function withMengajarSummary(
+  base: SummaryDashboardData,
+  mengajar: MengajarPayload
+): SummaryDashboardData {
+  const stats = computeMengajarStats(mengajar.rekap, mengajar.log);
+  const top = buildMengajarLeaderboard(mengajar.rekap)[0];
+
+  return {
+    ...base,
+    stats: base.stats.map((stat) =>
+      stat.program === "mengajar"
+        ? {
+            ...stat,
+            label: "Total Sesi Mengajar",
+            value: stats.totalSesi,
+            description: `${stats.totalSekolah} sekolah mitra · ${stats.totalPeserta.toLocaleString("id-ID")} peserta didik luar`,
+          }
+        : stat
+    ),
+    highlights: base.highlights.map((item) =>
+      item.program === "IDN Mengajar" && top
+        ? {
+            ...item,
+            title: `${top.nama.split(" ")[0]} · Top Pengajar`,
+            value: String(top.totalMengajar),
+          }
+        : item
+    ),
+  };
+}
+
+function withMenulisSummary(
+  base: SummaryDashboardData,
+  menulis: MenulisPayload
+): SummaryDashboardData {
+  const stats = computeMenulisStats(menulis);
+  const top = stats.topMenulis;
+
+  return {
+    ...base,
+    stats: base.stats.map((stat) =>
+      stat.program === "menulis"
+        ? {
+            ...stat,
+            label: "Total Halaman Menulis",
+            value: stats.totalPencapaianMenulis,
+            description: `${formatPct(stats.persenMenulis)} dari target ${formatNum(stats.totalTargetMenulis)} hlm · ${formatNum(stats.totalPencapaianSertifikat)} sertifikat`,
+          }
+        : stat
+    ),
+    highlights: base.highlights.map((item) =>
+      item.program === "IDN Menulis" && top
+        ? {
+            ...item,
+            title: `Kelas ${top.kelas} · Top Menulis`,
+            value: formatNum(top.pencapaian),
+          }
+        : item
+    ),
+  };
+}
+
+function withSeminarSummary(
+  base: SummaryDashboardData,
+  seminar: SeminarPayload
+): SummaryDashboardData {
+  const stats = computeSeminarStats(seminar.data);
+
+  return {
+    ...base,
+    stats: base.stats.map((stat) =>
+      stat.program === "seminar"
+        ? {
+            ...stat,
+            label: "Rata-rata Ketercapaian Seminar",
+            value: formatSeminarPct(stats.rataRata),
+            description: `${stats.pekanSelesai} pekan selesai 100% · ${stats.totalPekan} pekan`,
+          }
+        : stat
+    ),
+  };
+}
+
+function withLombaSummary(
+  base: SummaryDashboardData,
+  lomba: LombaItem[]
+): SummaryDashboardData {
+  const stats = computeLombaStats(lomba);
+  const groups = groupLombaByStatus(lomba);
+  const leaderboard = buildLeaderboard(lomba);
+  const top = getSpotlightStudent(leaderboard);
+
+  const lombaPerformers: SummaryTopPerformer[] = leaderboard
+    .slice(0, 3)
+    .map((student) => {
+      const best = bestAchievementFor(lomba, student.id);
+      const highlight = best
+        ? `Juara ${best.peringkat} · ${best.nama_lomba} (${best.tingkat_lomba}) · ${student.points} poin`
+        : `${student.totalJuara} perolehan juara · ${student.points} poin`;
+      return {
+        id: `lomba-${student.id}`,
+        name: student.name,
+        className: student.className,
+        categories: ["Lomba"],
+        highlight,
+      };
+    });
+
+  const baseOthers = (base.topPerformers ?? []).filter(
+    (p) => !lombaPerformers.some((l) => l.name === p.name)
+  );
+  const merged = lombaPerformers.map((l) => {
+    const other = base.topPerformers?.find((p) => p.name === l.name);
+    if (!other) return l;
+    return {
+      ...l,
+      categories: ["Lomba", ...other.categories.filter((c) => c !== "Lomba")],
+      highlight: `${l.highlight} · ${other.highlight}`,
+    };
+  });
+
+  return {
+    ...base,
+    stats: base.stats.map((stat) =>
+      stat.program === "lomba"
+        ? {
+            ...stat,
+            label: "Total Prestasi Lomba",
+            value: stats.totalKejuaraan,
+            description: `${groups.Pendaftaran.length} pendaftaran · ${groups.Pelaksanaan.length} pelaksanaan · ${groups.Selesai.length} selesai${top ? ` — dipimpin ${top.name}` : ""}`,
+          }
+        : stat
+    ),
+    highlights: base.highlights.map((item) =>
+      item.program === "IDN Lomba"
+        ? top
+          ? {
+              ...item,
+              title: `${top.name.split(" ")[0]} · Top Juara`,
+              value: String(top.totalJuara),
+            }
+          : { ...item, title: "Belum ada juara", value: "0" }
+        : item
+    ),
+    topPerformers: [...merged, ...baseOthers],
+  };
+}
+
 export default function HomePage() {
   const [activeMenu, setActiveMenu] = useState<MenuId>("summary");
   const [loading, setLoading] = useState(true);
   const [mengajarData, setMengajarData] =
-    useState<MengajarDashboardData>(FALLBACK_MENGAJAR_DATA);
-  const [error, setError] = useState<string | null>(null);
+    useState<MengajarPayload>(MOCK_MENGAJAR_PAYLOAD);
   const [lombaData, setLombaData] = useState<LombaItem[]>(MOCK_LOMBA_DATA);
   const [lombaLoading, setLombaLoading] = useState(true);
   const [lombaError, setLombaError] = useState<string | null>(null);
   const [lombaConnected, setLombaConnected] = useState(false);
   const [lombaSheet, setLombaSheet] = useState<string | null>(null);
+  const [talkingData, setTalkingData] =
+    useState<TalkingPayload>(MOCK_TALKING_PAYLOAD);
+  const [talkingLoading, setTalkingLoading] = useState(true);
+  const [menulisData, setMenulisData] =
+    useState<MenulisPayload>(MOCK_MENULIS_PAYLOAD);
+  const [menulisLoading, setMenulisLoading] = useState(true);
+  const [tabunganData, setTabunganData] =
+    useState<TabunganPayload>(EMPTY_TABUNGAN_PAYLOAD);
+  const [tabunganLoading, setTabunganLoading] = useState(true);
+  const [seminarData, setSeminarData] =
+    useState<SeminarPayload>(MOCK_SEMINAR_PAYLOAD);
+  const [seminarLoading, setSeminarLoading] = useState(true);
   const [tvMode, setTvMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [slideProgress, setSlideProgress] = useState(0);
@@ -81,20 +244,20 @@ export default function HomePage() {
 
     async function loadMengajar() {
       setLoading(true);
-      setError(null);
       try {
-        const result = await fetchSheetRows(SHEET_TAB_CANDIDATES.mengajar);
+        const res = await fetch("/api/mengajar", { cache: "no-store" });
+        const json = (await res.json()) as MengajarPayload;
         if (cancelled) return;
-
-        if (!result) {
-          setMengajarData({ ...FALLBACK_MENGAJAR_DATA, connected: false });
-        } else {
-          setMengajarData(mapSheetsToMengajar(result.rows));
-        }
+        setMengajarData(json);
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Terjadi kesalahan");
-          setMengajarData({ ...FALLBACK_MENGAJAR_DATA, connected: false });
+          setMengajarData({
+            ...MOCK_MENGAJAR_PAYLOAD,
+            message:
+              err instanceof Error
+                ? `Gagal memuat data IDN Mengajar (${err.message}).`
+                : "Gagal memuat data IDN Mengajar. Menampilkan data contoh.",
+          });
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -149,6 +312,134 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadTalking() {
+      setTalkingLoading(true);
+      try {
+        const res = await fetch("/api/talking", { cache: "no-store" });
+        const json = (await res.json()) as TalkingPayload;
+        if (cancelled) return;
+        setTalkingData(json);
+      } catch (err) {
+        if (!cancelled) {
+          setTalkingData({
+            ...MOCK_TALKING_PAYLOAD,
+            message:
+              err instanceof Error
+                ? `Gagal memuat data IDN Talking (${err.message}).`
+                : "Gagal memuat data IDN Talking. Menampilkan data contoh.",
+          });
+        }
+      } finally {
+        if (!cancelled) setTalkingLoading(false);
+      }
+    }
+
+    loadTalking();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMenulis(initial = false) {
+      if (initial) setMenulisLoading(true);
+      try {
+        const res = await fetch("/api/menulis", { cache: "no-store" });
+        const json = (await res.json()) as MenulisPayload;
+        if (cancelled) return;
+        setMenulisData(json);
+      } catch (err) {
+        if (!cancelled && initial) {
+          setMenulisData({
+            ...MOCK_MENULIS_PAYLOAD,
+            message:
+              err instanceof Error
+                ? `Gagal memuat data IDN Menulis (${err.message}).`
+                : "Gagal memuat data IDN Menulis. Menampilkan data contoh.",
+          });
+        }
+      } finally {
+        if (!cancelled && initial) setMenulisLoading(false);
+      }
+    }
+
+    void loadMenulis(true);
+    const refreshId = setInterval(() => {
+      void loadMenulis(false);
+    }, 20_000);
+    return () => {
+      cancelled = true;
+      clearInterval(refreshId);
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTabungan() {
+      setTabunganLoading(true);
+      try {
+        const res = await fetch("/api/tabungan", { cache: "no-store" });
+        const json = (await res.json()) as TabunganPayload;
+        if (cancelled) return;
+        setTabunganData(json);
+      } catch (err) {
+        if (!cancelled) {
+          setTabunganData({
+            ...EMPTY_TABUNGAN_PAYLOAD,
+            message:
+              err instanceof Error
+                ? `Gagal memuat data Tabungan Siswa (${err.message}).`
+                : "Gagal memuat data Tabungan Siswa.",
+          });
+        }
+      } finally {
+        if (!cancelled) setTabunganLoading(false);
+      }
+    }
+
+    loadTabungan();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSeminar() {
+      setSeminarLoading(true);
+      try {
+        const res = await fetch("/api/seminar", { cache: "no-store" });
+        const json = (await res.json()) as SeminarPayload;
+        if (cancelled) return;
+        setSeminarData(json);
+      } catch (err) {
+        if (!cancelled) {
+          setSeminarData({
+            ...MOCK_SEMINAR_PAYLOAD,
+            message:
+              err instanceof Error
+                ? `Gagal memuat data IDN Seminar (${err.message}).`
+                : "Gagal memuat data IDN Seminar. Menampilkan data contoh.",
+          });
+        }
+      } finally {
+        if (!cancelled) setSeminarLoading(false);
+      }
+    }
+
+    loadSeminar();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const syncFullscreen = () => {
       setIsFullscreen(Boolean(document.fullscreenElement));
     };
@@ -159,12 +450,9 @@ export default function HomePage() {
 
   // TV auto-play carousel: 10s per tab, with progress 0→1
   useEffect(() => {
-    if (!tvMode) {
-      setSlideProgress(0);
-      return;
-    }
+    if (!tvMode) return;
 
-    let start = performance.now();
+    const start = performance.now();
     let raf = 0;
     let advanced = false;
 
@@ -230,15 +518,52 @@ export default function HomePage() {
     setActiveMenu(id);
   }, []);
 
+  const summaryData = useMemo(
+    () =>
+      withLombaSummary(
+        withSeminarSummary(
+          withMenulisSummary(
+            withMengajarSummary(MOCK_SUMMARY, mengajarData),
+            menulisData
+          ),
+          seminarData
+        ),
+        lombaData
+      ),
+    [mengajarData, menulisData, seminarData, lombaData]
+  );
+
   const theme = getTheme(activeMenu);
   const showLiveBadge =
-    (activeMenu === "mengajar" && mengajarData.connected && !error) ||
-    (activeMenu === "lomba" && lombaConnected && !lombaError);
+    activeMenu === "summary"
+      ? mengajarData.connected ||
+        (lombaConnected && !lombaError) ||
+        talkingData.connected ||
+        menulisData.connected ||
+        tabunganData.connected ||
+        seminarData.connected
+      : (activeMenu === "mengajar" && mengajarData.connected) ||
+        (activeMenu === "lomba" && lombaConnected && !lombaError) ||
+        (activeMenu === "talking" && talkingData.connected) ||
+        (activeMenu === "menulis" && menulisData.connected) ||
+        (activeMenu === "tabungan" && tabunganData.connected) ||
+        (activeMenu === "seminar" && seminarData.connected);
 
-  const isProgramMenu =
-    activeMenu !== "summary" &&
-    activeMenu !== "mengajar" &&
-    activeMenu !== "lomba";
+  const syncing =
+    !showLiveBadge &&
+    ((activeMenu === "summary" &&
+      (loading ||
+        lombaLoading ||
+        talkingLoading ||
+        menulisLoading ||
+        tabunganLoading ||
+        seminarLoading)) ||
+      (activeMenu === "mengajar" && loading) ||
+      (activeMenu === "lomba" && lombaLoading) ||
+      (activeMenu === "talking" && talkingLoading) ||
+      (activeMenu === "menulis" && menulisLoading) ||
+      (activeMenu === "tabungan" && tabunganLoading) ||
+      (activeMenu === "seminar" && seminarLoading));
 
   return (
     <div
@@ -248,6 +573,7 @@ export default function HomePage() {
     >
       <Header
         connected={showLiveBadge}
+        syncing={syncing}
         activeMenu={activeMenu}
         tvMode={tvMode}
         isFullscreen={isFullscreen}
@@ -258,30 +584,12 @@ export default function HomePage() {
       />
 
       <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
-        {error && activeMenu === "mengajar" && !tvMode && (
-          <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-            Tidak dapat terhubung ke Google Sheets ({error}). Menampilkan data
-            cadangan roster IDN.
-          </div>
-        )}
-
-        {isProgramMenu && !tvMode && (
-          <div
-            className="mb-4 rounded-xl border px-4 py-2.5 text-xs sm:text-sm"
-            style={{
-              borderColor: `rgba(${theme.primaryRgb}, 0.3)`,
-              backgroundColor: `rgba(${theme.primaryRgb}, 0.1)`,
-              color: "var(--theme-secondary)",
-            }}
-          >
-            Menampilkan roster siswa IDN untuk{" "}
-            <span className="font-semibold text-white">{theme.label}</span>
-            {" "}(tab Sheets masih agregat / belum berisi nama siswa).
-          </div>
-        )}
-
         {(loading && activeMenu === "mengajar") ||
-        (lombaLoading && activeMenu === "lomba") ? (
+        (lombaLoading && activeMenu === "lomba") ||
+        (talkingLoading && activeMenu === "talking") ||
+        (menulisLoading && activeMenu === "menulis") ||
+        (tabunganLoading && activeMenu === "tabungan") ||
+        (seminarLoading && activeMenu === "seminar") ? (
           <DashboardSkeleton />
         ) : (
           <AnimatePresence mode="wait">
@@ -293,9 +601,9 @@ export default function HomePage() {
               transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
               {activeMenu === "summary" ? (
-                <SummaryView data={MOCK_SUMMARY} />
+                <SummaryView data={summaryData} />
               ) : activeMenu === "mengajar" ? (
-                <IdnMengajarView data={mengajarData} />
+                <IdnMengajarDashboard data={mengajarData} />
               ) : activeMenu === "lomba" ? (
                 <IdnLombaView
                   data={lombaData}
@@ -304,11 +612,15 @@ export default function HomePage() {
                   isLoading={false}
                   error={lombaError}
                 />
-              ) : (
-                <ProgramView
-                  data={getProgramMock(activeMenu as ProgramMenuId)}
-                />
-              )}
+              ) : activeMenu === "talking" ? (
+                <IdnTalkingDashboard data={talkingData} />
+              ) : activeMenu === "menulis" ? (
+                <IdnMenulisDashboard data={menulisData} />
+              ) : activeMenu === "tabungan" ? (
+                <IdnTabunganDashboard data={tabunganData} />
+              ) : activeMenu === "seminar" ? (
+                <IdnSeminarDashboard data={seminarData} />
+              ) : null}
             </motion.div>
           </AnimatePresence>
         )}

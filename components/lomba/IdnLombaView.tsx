@@ -5,7 +5,6 @@ import type { LombaItem } from "@/src/data/mockLomba";
 import { MOCK_LOMBA_DATA } from "@/src/data/mockLomba";
 import {
   DEFAULT_LOMBA_FILTERS,
-  buildActivityLog,
   buildJenjangChart,
   buildLeaderboard,
   buildSkalaChart,
@@ -13,16 +12,17 @@ import {
   countPelaksanaan,
   filterLombaData,
   getSpotlightStudent,
+  groupLombaByStatus,
   uniqueSorted,
   type LombaFilters,
 } from "@/lib/lomba";
-import { LombaActivityLog } from "./LombaActivityLog";
 import { LombaFilterBar } from "./LombaFilterBar";
 import { LombaJenjangChart } from "./LombaJenjangChart";
 import { LombaLeaderboard } from "./LombaLeaderboard";
 import { LombaSkalaChart } from "./LombaSkalaChart";
 import { LombaSpotlight } from "./LombaSpotlight";
 import { LombaStatCards } from "./LombaStatCards";
+import { LombaStatusCards } from "./LombaStatusCards";
 
 interface IdnLombaViewProps {
   data?: LombaItem[];
@@ -65,7 +65,7 @@ export function IdnLombaView({
   const skalaChart = useMemo(() => buildSkalaChart(filtered), [filtered]);
   const jenjangChart = useMemo(() => buildJenjangChart(filtered), [filtered]);
   const pelaksanaan = useMemo(() => countPelaksanaan(filtered), [filtered]);
-  const activity = useMemo(() => buildActivityLog(filtered), [filtered]);
+  const statusGroups = useMemo(() => groupLombaByStatus(filtered), [filtered]);
 
   if (isLoading) {
     return (
@@ -130,17 +130,18 @@ export function IdnLombaView({
           <div className="shrink-0">
             <LombaSkalaChart data={skalaChart} />
           </div>
-          <div className="shrink-0">
+          <div className="shrink-0 pb-2">
             <LombaJenjangChart
               data={jenjangChart}
               online={pelaksanaan.online}
               offline={pelaksanaan.offline}
             />
           </div>
-          <div className="shrink-0 pb-2">
-            <LombaActivityLog items={activity} />
-          </div>
         </div>
+      </div>
+
+      <div className="shrink-0 xl:h-[clamp(210px,27vh,300px)]">
+        <LombaStatusCards groups={statusGroups} />
       </div>
     </div>
   );

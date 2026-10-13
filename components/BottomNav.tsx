@@ -11,8 +11,8 @@ const NAV_LABELS: Record<MenuId, { full: string; short: string }> = {
   lomba: { full: "IDN Lomba", short: "Lomba" },
   menulis: { full: "IDN Menulis & Sertifikasi", short: "Menulis" },
   talking: { full: "IDN Talking", short: "Talking" },
-  karakter: { full: "IDN Karakter", short: "Karakter" },
-  tahfidz: { full: "IDN Tahfidz", short: "Tahfidz" },
+  tabungan: { full: "Tabungan Siswa", short: "Tabungan" },
+  seminar: { full: "IDN Seminar", short: "Seminar" },
 };
 
 interface BottomNavProps {

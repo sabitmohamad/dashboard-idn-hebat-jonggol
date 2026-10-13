@@ -4,11 +4,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  BookMarked,
   FileText,
   Headphones,
-  Heart,
   Layers,
+  Presentation,
   Maximize2,
   Minimize2,
   Pause,
@@ -17,6 +16,7 @@ import {
   School,
   Trophy,
   Tv,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { getTheme } from "@/lib/themes";
@@ -53,8 +53,8 @@ const TITLE_BY_MENU: Record<MenuId, string> = {
   lomba: "IDN Lomba",
   menulis: "IDN Menulis & Sertifikasi",
   talking: "IDN Talking",
-  karakter: "IDN Karakter",
-  tahfidz: "IDN Tahfidz",
+  tabungan: "Tabungan Siswa",
+  seminar: "IDN Seminar",
 };
 
 const ICON_BY_MENU: Record<MenuId, LucideIcon> = {
@@ -63,8 +63,8 @@ const ICON_BY_MENU: Record<MenuId, LucideIcon> = {
   lomba: Trophy,
   menulis: FileText,
   talking: Headphones,
-  karakter: Heart,
-  tahfidz: BookMarked,
+  tabungan: Wallet,
+  seminar: Presentation,
 };
 
 function formatClock(date: Date): string {
@@ -117,6 +117,8 @@ function ProgressRing({
 
 interface HeaderProps {
   connected: boolean;
+  /** True while the first sheet request is still in flight. */
+  syncing?: boolean;
   activeMenu: MenuId;
   tvMode: boolean;
   isFullscreen: boolean;
@@ -128,6 +130,7 @@ interface HeaderProps {
 
 export function Header({
   connected,
+  syncing = false,
   activeMenu,
   tvMode,
   isFullscreen,
@@ -308,16 +311,20 @@ export function Header({
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/25 bg-cyan-500/10 px-3 py-1.5">
             <span
               className={`pulse-dot h-2.5 w-2.5 rounded-full ${
-                connected ? "bg-cyan-400" : "bg-amber-400"
+                connected || syncing ? "bg-cyan-400" : "bg-amber-400"
               }`}
             />
             <Radio
-              className={`h-3.5 w-3.5 ${connected ? "text-cyan-400" : "text-amber-400"}`}
+              className={`h-3.5 w-3.5 ${
+                connected || syncing ? "text-cyan-400" : "text-amber-400"
+              }`}
             />
             <span className="text-[11px] font-semibold tracking-wide text-slate-200 sm:text-xs">
               {connected
                 ? "LIVE SYNC - Google Sheets Connected"
-                : "SYNC - Using Fallback Data"}
+                : syncing
+                  ? "SYNC - Menghubungkan Google Sheets"
+                  : "SYNC - Data Contoh"}
             </span>
           </div>
         </div>

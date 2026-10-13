@@ -107,16 +107,26 @@ export interface ChartSlice {
   color: string;
 }
 
-export interface ActivityItem {
+export interface LombaStatusEntry {
   id: string;
   namaLomba: string;
-  namaSiswa: string;
+  penyelenggara: string;
+  peserta: { name: string; peringkat: string }[];
   tingkatLomba: TingkatLomba;
-  status: StatusProgres;
+  pelaksanaan: PelaksanaanLomba;
+  jenis: LombaItem["jenis"];
+  /** Peringkat terbaik di antara peserta; "-" atau teks bebas bila tidak juara. */
   peringkat: string;
   tanggal: string;
-  pelaksanaan: PelaksanaanLomba;
 }
+
+export type LombaStatusGroups = Record<StatusProgres, LombaStatusEntry[]>;
+
+export const STATUS_ORDER: StatusProgres[] = [
+  "Pendaftaran",
+  "Pelaksanaan",
+  "Selesai",
+];
 
 function splitCsv(value: string): string[] {
   return value
@@ -347,29 +357,133 @@ export function countPelaksanaan(data: LombaItem[]): {
   return { online, offline };
 }
 
+const MONTH_PREFIXES: [string, number][] = [
+  ["jan", 1],
+  ["feb", 2],
+  ["mar", 3],
+  ["apr", 4],
+  ["mei", 5],
+  ["may", 5],
+  ["jun", 6],
+  ["jul", 7],
+  ["agu", 8],
+  ["aug", 8],
+  ["sep", 9],
+  ["okt", 10],
+  ["oct", 10],
+  ["nov", 11],
+  ["des", 12],
+  ["dec", 12],
+];
+
+/** Mendukung "dd/mm/yyyy" maupun teks bebas seperti "12 Oktober 2026". */
 function parseDateKey(tanggal: string): number {
-  const [dd, mm, yyyy] = tanggal.split("/").map(Number);
-  if (!dd || !mm || !yyyy) return 0;
-  return yyyy * 10_000 + mm * 100 + dd;
+  const slash = tanggal.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+  if (slash) {
+    return Number(slash[3]) * 10_000 + Number(slash[2]) * 100 + Number(slash[1]);
+  }
+  const text = tanggal.toLowerCase();
+  const year = text.match(/\d{4}/)?.[0];
+  const day = text.match(/\b(\d{1,2})\b/)?.[1];
+  const month = MONTH_PREFIXES.find(([prefix]) =>
+    new RegExp(`\\b${prefix}`).test(text)
+  )?.[1];
+  if (!year || !month) return 0;
+  return Number(year) * 10_000 + month * 100 + Number(day ?? 1);
 }
 
-export function buildActivityLog(
-  data: LombaItem[],
-  limit = 6
-): ActivityItem[] {
-  return [...data]
-    .sort((a, b) => parseDateKey(b.tanggal_kegiatan) - parseDateKey(a.tanggal_kegiatan))
-    .slice(0, limit)
-    .map((item) => ({
-      id: item.id_lomba,
-      namaLomba: item.nama_lomba,
-      namaSiswa: item.nama_siswa,
+function isJuara(peringkat: string): boolean {
+  return ["1", "2", "3"].includes(peringkat);
+}
+
+function bestPeringkat(a: string, b: string): string {
+  const rank = (p: string) => (isJuara(p) ? Number(p) : 99);
+  return rank(b) < rank(a) ? b : a;
+}
+
+function lombaKey(item: LombaItem): string {
+  const name = item.nama_lomba.trim().toLowerCase().replace(/\s+/g, " ");
+  return `${item.status_progres}::${name || item.id_lomba}`;
+}
+
+/**
+ * Kelompokkan lomba per status progres. Baris dengan nama lomba yang sama
+ * (mis. satu baris per siswa) digabung menjadi satu entri lomba.
+ */
+export function groupLombaByStatus(data: LombaItem[]): LombaStatusGroups {
+  const groups: LombaStatusGroups = {
+    Pendaftaran: [],
+    Pelaksanaan: [],
+    Selesai: [],
+  };
+  const index = new Map<string, LombaStatusEntry>();
+
+  for (const item of data) {
+    const key = lombaKey(item);
+    const peserta = parseParticipants(item)
+      .filter((p) => p.name && p.name !== "Siswa")
+      .map((p) => ({ name: p.name, peringkat: item.peringkat || "-" }));
+    const existing = index.get(key);
+
+    if (existing) {
+      for (const p of peserta) {
+        if (!existing.peserta.some((e) => e.name === p.name)) {
+          existing.peserta.push(p);
+        }
+      }
+      existing.peringkat = bestPeringkat(existing.peringkat, item.peringkat);
+      if (parseDateKey(item.tanggal_kegiatan) > parseDateKey(existing.tanggal)) {
+        existing.tanggal = item.tanggal_kegiatan;
+      }
+      continue;
+    }
+
+    const entry: LombaStatusEntry = {
+      id: key,
+      namaLomba: item.nama_lomba || item.id_lomba,
+      penyelenggara: item.penyelenggara,
+      peserta,
       tingkatLomba: item.tingkat_lomba,
-      status: item.status_progres,
-      peringkat: item.peringkat,
-      tanggal: item.tanggal_kegiatan,
       pelaksanaan: item.pelaksanaan,
-    }));
+      jenis: item.jenis,
+      peringkat: item.peringkat || "-",
+      tanggal: item.tanggal_kegiatan,
+    };
+    index.set(key, entry);
+    groups[item.status_progres].push(entry);
+  }
+
+  for (const status of STATUS_ORDER) {
+    groups[status].sort((a, b) => parseDateKey(b.tanggal) - parseDateKey(a.tanggal));
+  }
+
+  return groups;
+}
+
+/** Lomba selesai dengan peringkat terbaik dan tanggal terbaru per siswa. */
+export function bestAchievementFor(
+  data: LombaItem[],
+  studentId: string
+): LombaItem | null {
+  let best: LombaItem | null = null;
+  for (const item of data) {
+    if (!parseParticipants(item).some((p) => p.id === studentId)) continue;
+    const points = placementPoints(item.peringkat, item.tingkat_lomba);
+    if (points === 0) continue;
+    if (!best) {
+      best = item;
+      continue;
+    }
+    const bestPoints = placementPoints(best.peringkat, best.tingkat_lomba);
+    if (
+      points > bestPoints ||
+      (points === bestPoints &&
+        parseDateKey(item.tanggal_kegiatan) > parseDateKey(best.tanggal_kegiatan))
+    ) {
+      best = item;
+    }
+  }
+  return best;
 }
 
 export function uniqueSorted(values: string[]): string[] {

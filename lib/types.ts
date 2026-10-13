@@ -6,8 +6,8 @@ export type MenuId =
   | "lomba"
   | "menulis"
   | "talking"
-  | "karakter"
-  | "tahfidz";
+  | "tabungan"
+  | "seminar";
 
 export interface NavItem {
   id: MenuId;

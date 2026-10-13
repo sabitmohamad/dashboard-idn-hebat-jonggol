@@ -17,7 +17,7 @@ const SITE_TITLE =
   "IDN Hebat - Dashboard Prestasi Siswa SMP IDN Jonggol";
 
 const SITE_DESCRIPTION =
-  "Dashboard Pemantauan Prestasi, Mengajar, Lomba, Menulis, Character, dan Tahfidz Siswa IDN Boarding School.";
+  "Dashboard Pemantauan Prestasi, Mengajar, Lomba, Menulis, dan Talking Siswa IDN Boarding School.";
 
 export const metadata: Metadata = {
   title: {
@@ -33,7 +33,8 @@ export const metadata: Metadata = {
     "Dashboard Prestasi",
     "IDN Mengajar",
     "IDN Lomba",
-    "IDN Tahfidz",
+    "IDN Menulis",
+    "IDN Talking",
     "Boarding School",
   ],
   icons: {

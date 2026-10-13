@@ -397,7 +397,10 @@ export function mapSheetsToMengajar(rows: SheetRow[]): MengajarDashboardData {
   };
 }
 
-type ProgramMenuId = Exclude<MenuId, "summary" | "mengajar">;
+type ProgramMenuId = Exclude<
+  MenuId,
+  "summary" | "mengajar" | "tabungan" | "seminar"
+>;
 
 /**
  * Maps a Google Sheets program tab into ProgramDashboardData.

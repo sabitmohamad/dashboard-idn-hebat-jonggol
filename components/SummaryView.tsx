@@ -1,10 +1,10 @@
 import {
-  BookMarked,
   FileText,
   Headphones,
-  Heart,
+  Presentation,
   School,
   Trophy,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { MENU_THEMES } from "@/lib/themes";
@@ -17,8 +17,8 @@ const PROGRAM_ICONS: Record<Exclude<MenuId, "summary">, LucideIcon> = {
   lomba: Trophy,
   menulis: FileText,
   talking: Headphones,
-  karakter: Heart,
-  tahfidz: BookMarked,
+  tabungan: Wallet,
+  seminar: Presentation,
 };
 
 const ACCENT_TEXT: Record<KpiAccent, string> = {
@@ -58,13 +58,13 @@ export function SummaryView({ data }: SummaryViewProps) {
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-300">
               Snapshot seluruh program unggulan — dari mengajar, lomba, menulis,
-              talking, karakter, hingga tahfidz.
+              talking, hingga seminar.
             </p>
           </div>
         </div>
       </GlassCard>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {data.stats.map((stat) => {
           const Icon = PROGRAM_ICONS[stat.program];
           const theme = MENU_THEMES[stat.program];
