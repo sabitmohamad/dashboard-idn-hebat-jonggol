@@ -1,6 +1,12 @@
 import { Award, BadgeCheck, BookOpen, Trophy } from "lucide-react";
 import type { MenulisSchoolStats } from "@/lib/menulis";
 import { formatNum, formatPct } from "@/lib/menulis";
+import {
+  AnimatedBar,
+  CountUp,
+  Reveal,
+  staggerDelay,
+} from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 
 interface MenulisStatCardsProps {
@@ -13,6 +19,7 @@ export function MenulisStatCards({ stats }: MenulisStatCardsProps) {
       id: "menulis",
       label: "Total Pencapaian Menulis",
       value: formatNum(stats.totalPencapaianMenulis),
+      countUp: true,
       unit: "halaman",
       hint: `${formatPct(stats.persenMenulis)} dari target ${formatNum(stats.totalTargetMenulis)} hlm`,
       progress: stats.persenMenulis,
@@ -24,6 +31,7 @@ export function MenulisStatCards({ stats }: MenulisStatCardsProps) {
       id: "sertifikat",
       label: "Total Sertifikat Diraih",
       value: formatNum(stats.totalPencapaianSertifikat),
+      countUp: true,
       unit: "sertifikat",
       hint: `${formatPct(stats.persenSertifikat)} dari target ${formatNum(stats.totalTargetSertifikat)}`,
       progress: stats.persenSertifikat,
@@ -35,6 +43,7 @@ export function MenulisStatCards({ stats }: MenulisStatCardsProps) {
       id: "top-menulis",
       label: "Kelas Teratas Menulis",
       value: stats.topMenulis ? stats.topMenulis.kelas : "—",
+      countUp: false,
       unit: stats.topMenulis
         ? `${formatNum(stats.topMenulis.pencapaian)} hlm`
         : "Belum ada data",
@@ -50,6 +59,7 @@ export function MenulisStatCards({ stats }: MenulisStatCardsProps) {
       id: "top-sertifikat",
       label: "Kelas Teratas Sertifikasi",
       value: stats.topSertifikat ? stats.topSertifikat.kelas : "—",
+      countUp: false,
       unit: stats.topSertifikat
         ? `${formatNum(stats.topSertifikat.pencapaian)} sertifikat`
         : "Belum ada data",
@@ -65,34 +75,44 @@ export function MenulisStatCards({ stats }: MenulisStatCardsProps) {
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-      {cards.map((card) => {
+      {cards.map((card, index) => {
         const Icon = card.icon;
         return (
-          <GlassCard key={card.id} hover className="!p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-slate-400">{card.label}</p>
-                <p className="mt-2 truncate text-2xl font-bold tracking-tight text-white tabular-nums sm:text-3xl">
-                  {card.value}
-                </p>
-                <p className="mt-1 text-xs font-medium text-emerald-200/90">{card.unit}</p>
-              </div>
-              <div
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-gradient-to-br ${card.accent}`}
-              >
-                <Icon className="h-5 w-5" />
-              </div>
-            </div>
-            {card.progress !== null ? (
-              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+          <Reveal key={card.id} delay={staggerDelay(index, 0.07)}>
+            <GlassCard hover className="h-full !p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-400">{card.label}</p>
+                  <p className="mt-2 truncate text-2xl font-bold tracking-tight text-white tabular-nums sm:text-3xl">
+                    {card.countUp ? (
+                      <CountUp
+                        value={card.value}
+                        delay={staggerDelay(index, 0.07, 0.2)}
+                      />
+                    ) : (
+                      card.value
+                    )}
+                  </p>
+                  <p className="mt-1 text-xs font-medium text-emerald-200/90">{card.unit}</p>
+                </div>
                 <div
-                  className={`h-full rounded-full ${card.bar}`}
-                  style={{ width: `${Math.min(Math.max(card.progress, 0), 100)}%` }}
-                />
+                  className={`stat-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-gradient-to-br ${card.accent}`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
               </div>
-            ) : null}
-            <p className="mt-2 text-[11px] leading-snug text-slate-500">{card.hint}</p>
-          </GlassCard>
+              {card.progress !== null ? (
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <AnimatedBar
+                    percent={card.progress}
+                    delay={staggerDelay(index, 0.07, 0.35)}
+                    className={`h-full rounded-full ${card.bar}`}
+                  />
+                </div>
+              ) : null}
+              <p className="mt-2 text-[11px] leading-snug text-slate-500">{card.hint}</p>
+            </GlassCard>
+          </Reveal>
         );
       })}
     </div>

@@ -139,7 +139,7 @@ export function Header({
   onToggleTvMode,
   onToggleFullscreen,
 }: HeaderProps) {
-  const [clock, setClock] = useState(() => formatClock(new Date()));
+  const [clock, setClock] = useState("");
   const theme = getTheme(activeMenu);
   const title = TITLE_BY_MENU[activeMenu];
   const TitleIcon = ICON_BY_MENU[activeMenu];
@@ -260,7 +260,7 @@ export function Header({
             <button
               type="button"
               onClick={onToggleTvMode}
-              className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${
+              className={`press inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${
                 tvMode
                   ? "border-white/20 text-white"
                   : "border-white/10 text-slate-200 hover:border-white/25 hover:bg-white/5"
@@ -289,7 +289,7 @@ export function Header({
             <button
               type="button"
               onClick={onToggleFullscreen}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-slate-200 transition-all hover:border-white/25 hover:bg-white/5 sm:text-sm"
+              className="press inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-slate-200 transition-all hover:border-white/25 hover:bg-white/5 sm:text-sm"
               title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
               aria-pressed={isFullscreen}
             >
@@ -304,7 +304,10 @@ export function Header({
             </button>
           </div>
 
-          <div className="rounded-xl border border-[rgba(var(--theme-primary-rgb),0.25)] bg-[#0F172A]/60 px-3 py-2 font-mono text-xs text-slate-200 sm:text-sm">
+          <div
+            className="rounded-xl border border-[rgba(var(--theme-primary-rgb),0.25)] bg-[#0F172A]/60 px-3 py-2 font-mono text-xs text-slate-200 sm:text-sm"
+            suppressHydrationWarning
+          >
             {clock}
           </div>
 

@@ -8,6 +8,7 @@ import {
   sortLogTerbaru,
 } from "@/lib/mengajar";
 import type { MengajarPayload } from "@/src/data/mockMengajar";
+import { Reveal } from "@/components/Animate";
 import { MengajarActivityLog } from "./MengajarActivityLog";
 import { MengajarLeaderboard } from "./MengajarLeaderboard";
 import { MengajarMateriChart } from "./MengajarMateriChart";
@@ -37,7 +38,7 @@ export function IdnMengajarDashboard({ data }: IdnMengajarDashboardProps) {
         </div>
       ) : null}
 
-      <p className="text-xs text-slate-400">
+      <Reveal as="p" variant="fade" className="text-xs text-slate-400">
         {data.connected ? (
           <>
             Sumber:{" "}
@@ -47,20 +48,25 @@ export function IdnMengajarDashboard({ data }: IdnMengajarDashboardProps) {
         ) : (
           <>Sumber: data contoh (fallback)</>
         )}
-      </p>
+      </Reveal>
 
       <MengajarStatCards stats={stats} />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12 xl:items-start">
-        <div className="xl:col-span-5">
+        <Reveal delay={0.2} className="xl:col-span-5">
           <MengajarLeaderboard items={leaderboard} />
-        </div>
+        </Reveal>
 
         <div className="flex flex-col gap-4 xl:col-span-7">
-          <MengajarMateriChart data={materi} />
-          <div className="mengajar-scroll xl:max-h-[calc(100vh-520px)] xl:min-h-[320px] xl:overflow-y-auto">
+          <Reveal delay={0.3}>
+            <MengajarMateriChart data={materi} />
+          </Reveal>
+          <Reveal
+            delay={0.4}
+            className="mengajar-scroll xl:max-h-[calc(100vh-520px)] xl:min-h-[320px] xl:overflow-y-auto"
+          >
             <MengajarActivityLog items={log} />
-          </div>
+          </Reveal>
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ import {
 import { BarChart3 } from "lucide-react";
 import type { MenulisChartPoint } from "@/lib/menulis";
 import { formatNum, percent, formatPct } from "@/lib/menulis";
+import { useTvMode } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 
 interface MenulisCompareChartProps {
@@ -28,6 +29,7 @@ export function MenulisCompareChart({
   unit,
   pencapaianColor,
 }: MenulisCompareChartProps) {
+  const tv = useTvMode();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -118,7 +120,10 @@ export function MenulisCompareChart({
                   fill={pencapaianColor}
                   radius={[6, 6, 0, 0]}
                   maxBarSize={26}
-                  isAnimationActive={false}
+                  isAnimationActive={!tv}
+                  animationBegin={200}
+                  animationDuration={900}
+                  animationEasing="ease-out"
                 />
                 <Bar
                   dataKey="target"
@@ -126,7 +131,10 @@ export function MenulisCompareChart({
                   fill="#475569"
                   radius={[6, 6, 0, 0]}
                   maxBarSize={26}
-                  isAnimationActive={false}
+                  isAnimationActive={!tv}
+                  animationBegin={350}
+                  animationDuration={900}
+                  animationEasing="ease-out"
                 />
               </BarChart>
             </ResponsiveContainer>

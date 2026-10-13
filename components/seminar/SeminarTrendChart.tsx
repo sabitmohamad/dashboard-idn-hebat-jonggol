@@ -13,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { TrendingUp } from "lucide-react";
+import { useTvMode } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 import { formatPct, type SeminarTrendPoint } from "@/lib/seminar";
 
@@ -29,6 +30,7 @@ function barColor(value: number): string {
 }
 
 export function SeminarTrendChart({ data }: SeminarTrendChartProps) {
+  const tv = useTvMode();
   const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
 
   return (
@@ -105,7 +107,10 @@ export function SeminarTrendChart({ data }: SeminarTrendChartProps) {
                 name="Rata-rata ketercapaian"
                 radius={[6, 6, 0, 0]}
                 maxBarSize={36}
-                isAnimationActive={false}
+                isAnimationActive={!tv}
+                animationBegin={200}
+                animationDuration={900}
+                animationEasing="ease-out"
               >
                 {data.map((point) => (
                   <Cell key={point.bulan} fill={barColor(point.rataRata)} />
@@ -121,7 +126,10 @@ export function SeminarTrendChart({ data }: SeminarTrendChartProps) {
                 activeDot={{ r: 5 }}
                 legendType="none"
                 tooltipType="none"
-                isAnimationActive={false}
+                isAnimationActive={!tv}
+                animationBegin={600}
+                animationDuration={1100}
+                animationEasing="ease-out"
               />
             </ComposedChart>
           </ResponsiveContainer>

@@ -10,6 +10,7 @@ import {
   type MonthFilter,
 } from "@/lib/seminar";
 import type { SeminarPayload } from "@/src/data/mockSeminar";
+import { CountUp, Reveal } from "@/components/Animate";
 import { SeminarStatCards } from "./SeminarStatCards";
 import { SeminarTable } from "./SeminarTable";
 import { SeminarTrendChart } from "./SeminarTrendChart";
@@ -87,7 +88,10 @@ export function IdnSeminarDashboard({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <Reveal
+        variant="fade"
+        className="flex flex-wrap items-center justify-between gap-2"
+      >
         <p className="text-xs text-slate-400">
           {data.connected ? (
             <>
@@ -125,25 +129,28 @@ export function IdnSeminarDashboard({
               void sync();
             }}
             disabled={syncing}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1 text-[11px] font-semibold text-slate-200 transition-colors hover:border-white/25 hover:bg-white/5 disabled:opacity-60"
+            className="press inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1 text-[11px] font-semibold text-slate-200 transition-colors hover:border-white/25 hover:bg-white/5 disabled:opacity-60"
             title={`Sinkron otomatis setiap ${SYNC_INTERVAL_MS / 1000} detik`}
           >
             <RefreshCw className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`} />
             Sinkronkan
           </button>
         </div>
-      </div>
+      </Reveal>
 
       <SeminarStatCards stats={stats} />
 
-      <div className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-slate-900/50 p-2 sm:flex-row sm:items-center sm:justify-between">
+      <Reveal
+        delay={0.3}
+        className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-slate-900/50 p-2 sm:flex-row sm:items-center sm:justify-between"
+      >
         <label className="relative flex items-center sm:w-64">
           <Filter className="pointer-events-none absolute left-3 h-4 w-4 text-sky-300" />
           <span className="sr-only">Filter bulan</span>
           <select
             value={month}
             onChange={(event) => setMonth(event.target.value as MonthFilter)}
-            className="w-full appearance-none rounded-xl border border-white/10 bg-slate-950/70 py-2.5 pr-9 pl-9 text-sm font-medium text-white outline-none transition-colors focus:border-sky-400/60"
+            className="interactive-field w-full appearance-none rounded-xl border border-white/10 bg-slate-950/70 py-2.5 pr-9 pl-9 text-sm font-medium text-white outline-none focus:border-sky-400/60"
           >
             <option value="Semua" className="bg-slate-900">
               Semua Bulan
@@ -157,13 +164,18 @@ export function IdnSeminarDashboard({
           <ChevronDown className="pointer-events-none absolute right-3 h-4 w-4 text-slate-400" />
         </label>
         <p className="px-2 text-[11px] text-slate-400">
-          {filtered.length.toLocaleString("id-ID")} pekan ditampilkan
+          <CountUp value={filtered.length} duration={0.6} delay={0} /> pekan
+          ditampilkan
           {month === "Semua" ? "" : ` · ${month}`}
         </p>
-      </div>
+      </Reveal>
 
-      <SeminarTrendChart data={trend} />
-      <SeminarTable rows={filtered} />
+      <Reveal delay={0.38}>
+        <SeminarTrendChart data={trend} />
+      </Reveal>
+      <Reveal delay={0.46}>
+        <SeminarTable key={month} rows={filtered} />
+      </Reveal>
     </div>
   );
 }

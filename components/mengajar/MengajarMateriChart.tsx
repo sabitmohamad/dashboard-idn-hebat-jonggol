@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { BookOpen } from "lucide-react";
 import type { MateriSlice } from "@/lib/mengajar";
+import { useTvMode } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 
 interface MengajarMateriChartProps {
@@ -22,6 +23,7 @@ function shorten(label: string, max = 28): string {
 }
 
 export function MengajarMateriChart({ data }: MengajarMateriChartProps) {
+  const tv = useTvMode();
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
   return (
@@ -74,7 +76,14 @@ export function MengajarMateriChart({ data }: MengajarMateriChartProps) {
                 }}
                 labelStyle={{ color: "#fff", fontWeight: 600 }}
               />
-              <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={22} isAnimationActive={false}>
+              <Bar
+                dataKey="value"
+                radius={[0, 6, 6, 0]}
+                maxBarSize={22}
+                isAnimationActive={!tv}
+                animationDuration={900}
+                animationEasing="ease-out"
+              >
                 {data.map((entry) => (
                   <Cell key={entry.name} fill={entry.color} />
                 ))}

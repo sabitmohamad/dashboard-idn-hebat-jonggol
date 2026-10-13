@@ -1,4 +1,5 @@
 import { Crown, Users, Wallet } from "lucide-react";
+import { CountUp, Reveal, staggerDelay } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 import { formatRupiah, type TabunganStats } from "@/lib/tabungan";
 
@@ -41,29 +42,35 @@ export function TabunganStatCards({ stats }: TabunganStatCardsProps) {
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:gap-4">
-      {cards.map((card) => {
+      {cards.map((card, index) => {
         const Icon = card.icon;
         return (
-          <GlassCard key={card.id} hover className="!p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-slate-400">
-                  {card.label}
-                </p>
-                <p className="mt-2 truncate text-2xl font-bold tracking-tight text-white tabular-nums sm:text-3xl">
-                  {card.value}
-                </p>
+          <Reveal key={card.id} delay={staggerDelay(index, 0.08)}>
+            <GlassCard hover className="h-full !p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-400">
+                    {card.label}
+                  </p>
+                  <p className="mt-2 truncate text-2xl font-bold tracking-tight text-white tabular-nums sm:text-3xl">
+                    <CountUp
+                      value={card.value}
+                      duration={1.3}
+                      delay={staggerDelay(index, 0.08, 0.2)}
+                    />
+                  </p>
+                </div>
+                <div
+                  className={`stat-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-gradient-to-br ${card.accent}`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
               </div>
-              <div
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-gradient-to-br ${card.accent}`}
-              >
-                <Icon className="h-5 w-5" />
-              </div>
-            </div>
-            <p className="mt-2 truncate text-[11px] leading-snug text-slate-400">
-              {card.hint}
-            </p>
-          </GlassCard>
+              <p className="mt-2 truncate text-[11px] leading-snug text-slate-400">
+                {card.hint}
+              </p>
+            </GlassCard>
+          </Reveal>
         );
       })}
     </div>

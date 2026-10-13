@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { Globe, MapPin } from "lucide-react";
 import type { ChartSlice } from "@/lib/lomba";
+import { CountUp, Reveal, useTvMode } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 
 interface LombaJenjangChartProps {
@@ -24,6 +25,7 @@ export function LombaJenjangChart({
   online,
   offline,
 }: LombaJenjangChartProps) {
+  const tv = useTvMode();
   const total = data.reduce((sum, d) => sum + d.value, 0);
   const chartData = data.map((d) => ({
     ...d,
@@ -31,17 +33,14 @@ export function LombaJenjangChart({
   }));
 
   return (
-    <GlassCard
-      title="Jenjang Sekolah Target"
-      className="h-full"
-    >
+    <GlassCard title="Jenjang Sekolah Target" className="h-full min-h-[220px]">
       {total === 0 ? (
         <p className="py-8 text-center text-sm text-slate-400">
           Tidak ada data jenjang sekolah.
         </p>
       ) : (
         <>
-          <div className="h-36 w-full">
+          <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
                 <XAxis
@@ -74,7 +73,10 @@ export function LombaJenjangChart({
                   dataKey="value"
                   radius={[6, 6, 0, 0]}
                   maxBarSize={36}
-                  isAnimationActive={false}
+                  isAnimationActive={!tv}
+                  animationBegin={250}
+                  animationDuration={900}
+                  animationEasing="ease-out"
                 >
                   {chartData.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
@@ -85,14 +87,26 @@ export function LombaJenjangChart({
           </div>
 
           <div className="mt-3 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2.5 py-1 text-[11px] font-medium text-sky-300">
+            <Reveal
+              as="span"
+              interactive
+              variant="scale"
+              delay={0.5}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-2.5 py-1 text-[11px] font-medium text-sky-300"
+            >
               <Globe className="h-3 w-3" />
-              Online {online}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-300">
+              Online <CountUp value={online} duration={0.7} delay={0.6} />
+            </Reveal>
+            <Reveal
+              as="span"
+              interactive
+              variant="scale"
+              delay={0.58}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-300"
+            >
               <MapPin className="h-3 w-3" />
-              Offline {offline}
-            </span>
+              Offline <CountUp value={offline} duration={0.7} delay={0.68} />
+            </Reveal>
           </div>
         </>
       )}

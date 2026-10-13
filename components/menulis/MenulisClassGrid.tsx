@@ -1,5 +1,11 @@
 import type { KelasProgress, MenulisTab, ProgressTone } from "@/lib/menulis";
 import { formatNum, formatPct, progressTone } from "@/lib/menulis";
+import {
+  AnimatedBar,
+  CountUp,
+  Reveal,
+  staggerDelay,
+} from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 
 interface MenulisClassGridProps {
@@ -27,6 +33,7 @@ function ProgressBlock({
   persen,
   kekurangan,
   kekuranganLabel,
+  delay = 0,
 }: {
   label: string;
   pencapaian: number;
@@ -35,6 +42,7 @@ function ProgressBlock({
   persen: number;
   kekurangan: number;
   kekuranganLabel: string;
+  delay?: number;
 }) {
   const tone = progressTone(persen);
   const tercapai = kekurangan <= 0 && target > 0;
@@ -46,17 +54,20 @@ function ProgressBlock({
           {label}
         </p>
         <p className={`text-sm font-bold tabular-nums ${TONE_TEXT[tone]}`}>
-          {formatPct(persen)}
+          <CountUp value={formatPct(persen)} duration={0.9} delay={delay} />
         </p>
       </div>
       <p className="mt-1 text-sm text-slate-200 tabular-nums">
-        <span className="font-semibold text-white">{formatNum(pencapaian)}</span>
+        <span className="font-semibold text-white">
+          <CountUp value={formatNum(pencapaian)} duration={0.9} delay={delay} />
+        </span>
         <span className="text-slate-500"> / {formatNum(target)} {unit}</span>
       </p>
       <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/10">
-        <div
-          className={`h-full rounded-full transition-all ${TONE_BAR[tone]}`}
-          style={{ width: `${Math.min(Math.max(persen, 0), 100)}%` }}
+        <AnimatedBar
+          percent={persen}
+          delay={delay}
+          className={`h-full rounded-full ${TONE_BAR[tone]}`}
         />
       </div>
       <div className="mt-2">
@@ -110,40 +121,47 @@ export function MenulisClassGrid({ rows, view }: MenulisClassGridProps) {
         </GlassCard>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {rows.map((row) => (
-            <GlassCard key={row.kelas} hover className="!p-4">
-              <p className="text-[10px] font-semibold tracking-[0.16em] text-emerald-300/80 uppercase">
-                Kelas
-              </p>
-              <p className="mt-0.5 text-2xl font-bold tracking-tight text-white">
-                {row.kelas}
-              </p>
-              <div className={showMenulis && showSertifikat ? "mt-4 space-y-4" : "mt-4"}>
-                {showMenulis ? (
-                  <ProgressBlock
-                    label="Program Menulis"
-                    pencapaian={row.pencapaianMenulis}
-                    target={row.targetMenulis}
-                    unit="hlm"
-                    persen={row.persenMenulis}
-                    kekurangan={row.kekuranganHalaman}
-                    kekuranganLabel="hlm"
-                  />
-                ) : null}
-                {showSertifikat ? (
-                  <ProgressBlock
-                    label="Program Sertifikasi"
-                    pencapaian={row.pencapaianSertifikat}
-                    target={row.targetSertifikat}
-                    unit="sertifikat"
-                    persen={row.persenSertifikat}
-                    kekurangan={row.kekuranganSertifikat}
-                    kekuranganLabel="sertifikat"
-                  />
-                ) : null}
-              </div>
-            </GlassCard>
-          ))}
+          {rows.map((row, index) => {
+            const delay = staggerDelay(index, 0.06, 0.15);
+            return (
+              <Reveal key={row.kelas} delay={delay}>
+                <GlassCard hover className="h-full !p-4">
+                  <p className="text-[10px] font-semibold tracking-[0.16em] text-emerald-300/80 uppercase">
+                    Kelas
+                  </p>
+                  <p className="mt-0.5 text-2xl font-bold tracking-tight text-white">
+                    {row.kelas}
+                  </p>
+                  <div className={showMenulis && showSertifikat ? "mt-4 space-y-4" : "mt-4"}>
+                    {showMenulis ? (
+                      <ProgressBlock
+                        label="Program Menulis"
+                        pencapaian={row.pencapaianMenulis}
+                        target={row.targetMenulis}
+                        unit="hlm"
+                        persen={row.persenMenulis}
+                        kekurangan={row.kekuranganHalaman}
+                        kekuranganLabel="hlm"
+                        delay={delay + 0.2}
+                      />
+                    ) : null}
+                    {showSertifikat ? (
+                      <ProgressBlock
+                        label="Program Sertifikasi"
+                        pencapaian={row.pencapaianSertifikat}
+                        target={row.targetSertifikat}
+                        unit="sertifikat"
+                        persen={row.persenSertifikat}
+                        kekurangan={row.kekuranganSertifikat}
+                        kekuranganLabel="sertifikat"
+                        delay={delay + 0.3}
+                      />
+                    ) : null}
+                  </div>
+                </GlassCard>
+              </Reveal>
+            );
+          })}
         </div>
       )}
     </section>

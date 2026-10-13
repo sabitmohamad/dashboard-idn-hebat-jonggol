@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import { EASE_OUT, TvModeProvider, menuPresence } from "@/components/Animate";
 import { BottomNav } from "@/components/BottomNav";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { Header } from "@/components/Header";
@@ -73,6 +74,7 @@ export default function HomePage() {
   const [tvMode, setTvMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [slideProgress, setSlideProgress] = useState(0);
+  const [navDirection, setNavDirection] = useState(1);
 
   useEffect(() => {
     let cancelled = false;
@@ -297,6 +299,7 @@ export default function HomePage() {
 
       if (progress >= 1 && !advanced) {
         advanced = true;
+        setNavDirection(1);
         setActiveMenu((current) => nextMenuId(current));
         return;
       }
@@ -350,7 +353,12 @@ export default function HomePage() {
   const handleManualNav = useCallback((id: MenuId) => {
     setTvMode(false);
     setSlideProgress(0);
-    setActiveMenu(id);
+    setActiveMenu((current) => {
+      const from = NAV_ITEMS.findIndex((item) => item.id === current);
+      const to = NAV_ITEMS.findIndex((item) => item.id === id);
+      setNavDirection(to >= from ? 1 : -1);
+      return id;
+    });
   }, []);
 
   const summaryData = useMemo(
@@ -398,75 +406,82 @@ export default function HomePage() {
       (activeMenu === "seminar" && seminarLoading));
 
   return (
-    <div
-      className={`dashboard-bg text-white ${
-        tvMode ? "flex h-dvh flex-col overflow-hidden" : "min-h-screen pb-8"
-      }`}
-      data-theme={activeMenu}
-      data-tv={tvMode ? "true" : undefined}
-      style={themeCssVars(theme)}
-    >
-      <Header
-        connected={showLiveBadge}
-        syncing={syncing}
-        activeMenu={activeMenu}
-        tvMode={tvMode}
-        isFullscreen={isFullscreen}
-        slideProgress={slideProgress}
-        slideSeconds={TV_SLIDE_SECONDS}
-        onToggleTvMode={toggleTvMode}
-        onToggleFullscreen={toggleFullscreen}
-      />
+    <MotionConfig reducedMotion="user">
+      <TvModeProvider value={tvMode}>
+        <div
+          className={`dashboard-bg text-white ${
+            tvMode ? "flex h-dvh flex-col overflow-hidden" : "min-h-screen pb-8"
+          }`}
+          data-theme={activeMenu}
+          data-tv={tvMode ? "true" : undefined}
+          style={themeCssVars(theme)}
+        >
+          <Header
+            connected={showLiveBadge}
+            syncing={syncing}
+            activeMenu={activeMenu}
+            tvMode={tvMode}
+            isFullscreen={isFullscreen}
+            slideProgress={slideProgress}
+            slideSeconds={TV_SLIDE_SECONDS}
+            onToggleTvMode={toggleTvMode}
+            onToggleFullscreen={toggleFullscreen}
+          />
 
-      <main
-        className={`mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8 ${
-          tvMode ? "min-h-0 flex-1 overflow-hidden py-3" : "py-6"
-        }`}
-      >
-        {(loading && activeMenu === "mengajar") ||
-        (lombaLoading && activeMenu === "lomba") ||
-        (talkingLoading && activeMenu === "talking") ||
-        (menulisLoading && activeMenu === "menulis") ||
-        (tabunganLoading && activeMenu === "tabungan") ||
-        (seminarLoading && activeMenu === "seminar") ? (
-          <DashboardSkeleton />
-        ) : (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeMenu}
-              className={tvMode ? "h-full min-h-0" : undefined}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {activeMenu === "summary" ? (
-                <SummaryView data={summaryData} />
-              ) : activeMenu === "mengajar" ? (
-                <IdnMengajarDashboard data={mengajarData} />
-              ) : activeMenu === "lomba" ? (
-                <IdnLombaView
-                  data={lombaData}
-                  connected={lombaConnected}
-                  sheet={lombaSheet}
-                  isLoading={false}
-                  error={lombaError}
-                />
-              ) : activeMenu === "talking" ? (
-                <IdnTalkingDashboard data={talkingData} />
-              ) : activeMenu === "menulis" ? (
-                <IdnMenulisDashboard data={menulisData} />
-              ) : activeMenu === "tabungan" ? (
-                <IdnTabunganDashboard data={tabunganData} />
-              ) : activeMenu === "seminar" ? (
-                <IdnSeminarDashboard data={seminarData} />
-              ) : null}
-            </motion.div>
-          </AnimatePresence>
-        )}
-      </main>
+          <main
+            className={`relative z-10 mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8 ${
+              tvMode ? "min-h-0 flex-1 overflow-hidden py-3" : "py-6"
+            }`}
+          >
+            {(loading && activeMenu === "mengajar") ||
+            (lombaLoading && activeMenu === "lomba") ||
+            (talkingLoading && activeMenu === "talking") ||
+            (menulisLoading && activeMenu === "menulis") ||
+            (tabunganLoading && activeMenu === "tabungan") ||
+            (seminarLoading && activeMenu === "seminar") ? (
+              <DashboardSkeleton />
+            ) : (
+              <AnimatePresence mode="wait" custom={navDirection}>
+                <motion.div
+                  key={activeMenu}
+                  className={tvMode ? "h-full min-h-0" : undefined}
+                  // TV browsers blank Recharts SVG under transformed ancestors,
+                  // so the slide only runs in interactive mode.
+                  {...menuPresence(navDirection, tvMode)}
+                  transition={{ duration: 0.4, ease: EASE_OUT }}
+                >
+                  {activeMenu === "summary" ? (
+                    <SummaryView
+                      data={summaryData}
+                      onSelectMenu={handleManualNav}
+                    />
+                  ) : activeMenu === "mengajar" ? (
+                    <IdnMengajarDashboard data={mengajarData} />
+                  ) : activeMenu === "lomba" ? (
+                    <IdnLombaView
+                      data={lombaData}
+                      connected={lombaConnected}
+                      sheet={lombaSheet}
+                      isLoading={false}
+                      error={lombaError}
+                    />
+                  ) : activeMenu === "talking" ? (
+                    <IdnTalkingDashboard data={talkingData} />
+                  ) : activeMenu === "menulis" ? (
+                    <IdnMenulisDashboard data={menulisData} />
+                  ) : activeMenu === "tabungan" ? (
+                    <IdnTabunganDashboard data={tabunganData} />
+                  ) : activeMenu === "seminar" ? (
+                    <IdnSeminarDashboard data={seminarData} />
+                  ) : null}
+                </motion.div>
+              </AnimatePresence>
+            )}
+          </main>
 
-      <BottomNav active={activeMenu} onChange={handleManualNav} />
-    </div>
+          <BottomNav active={activeMenu} onChange={handleManualNav} />
+        </div>
+      </TvModeProvider>
+    </MotionConfig>
   );
 }

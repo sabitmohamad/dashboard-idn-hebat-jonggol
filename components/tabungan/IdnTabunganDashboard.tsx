@@ -11,6 +11,7 @@ import {
   type KelasFilter,
 } from "@/lib/tabungan";
 import type { TabunganPayload } from "@/src/data/tabungan";
+import { Reveal } from "@/components/Animate";
 import { TabunganStatCards } from "./TabunganStatCards";
 import { TabunganTable } from "./TabunganTable";
 import { TabunganTrendChart } from "./TabunganTrendChart";
@@ -96,7 +97,10 @@ export function IdnTabunganDashboard({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <Reveal
+        variant="fade"
+        className="flex flex-wrap items-center justify-between gap-2"
+      >
         <p className="text-xs text-slate-400">
           {data.connected ? (
             <>
@@ -133,7 +137,7 @@ export function IdnTabunganDashboard({
             type="button"
             onClick={handleManualSync}
             disabled={syncing}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1 text-[11px] font-semibold text-slate-200 transition-colors hover:border-white/25 hover:bg-white/5 disabled:opacity-60"
+            className="press inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1 text-[11px] font-semibold text-slate-200 transition-colors hover:border-white/25 hover:bg-white/5 disabled:opacity-60"
             title={`Sinkron otomatis setiap ${SYNC_INTERVAL_MS / 1000} detik`}
           >
             <RefreshCw
@@ -142,16 +146,19 @@ export function IdnTabunganDashboard({
             Sinkronkan
           </button>
         </div>
-      </div>
+      </Reveal>
 
-      <div className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-slate-900/50 p-2 sm:flex-row sm:items-center">
+      <Reveal
+        delay={0.08}
+        className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-slate-900/50 p-2 sm:flex-row sm:items-center"
+      >
         <label className="relative flex items-center sm:w-56">
           <Filter className="pointer-events-none absolute left-3 h-4 w-4 text-yellow-300" />
           <span className="sr-only">Filter kelas</span>
           <select
             value={kelas}
             onChange={(e) => setKelas(e.target.value as KelasFilter)}
-            className="w-full appearance-none rounded-xl border border-white/10 bg-slate-950/70 py-2.5 pr-9 pl-9 text-sm font-medium text-white outline-none transition-colors focus:border-yellow-400/60"
+            className="interactive-field w-full appearance-none rounded-xl border border-white/10 bg-slate-950/70 py-2.5 pr-9 pl-9 text-sm font-medium text-white outline-none focus:border-yellow-400/60"
           >
             {KELAS_OPTIONS.map((option) => (
               <option key={option} value={option} className="bg-slate-900">
@@ -170,7 +177,7 @@ export function IdnTabunganDashboard({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Cari nama siswa…"
-            className="w-full rounded-xl border border-white/10 bg-slate-950/70 py-2.5 pr-9 pl-9 text-sm text-white placeholder:text-slate-500 outline-none transition-colors focus:border-yellow-400/60 [&::-webkit-search-cancel-button]:hidden"
+            className="interactive-field w-full rounded-xl border border-white/10 bg-slate-950/70 py-2.5 pr-9 pl-9 text-sm text-white placeholder:text-slate-500 outline-none focus:border-yellow-400/60 [&::-webkit-search-cancel-button]:hidden"
           />
           {query ? (
             <button
@@ -183,17 +190,21 @@ export function IdnTabunganDashboard({
             </button>
           ) : null}
         </label>
-      </div>
+      </Reveal>
 
       <TabunganStatCards stats={stats} />
 
-      <TabunganTrendChart data={trend} />
+      <Reveal delay={0.3}>
+        <TabunganTrendChart data={trend} />
+      </Reveal>
 
-      <TabunganTable
-        rows={rows}
-        months={months}
-        topTotal={stats.tertinggi?.total ?? 0}
-      />
+      <Reveal delay={0.4}>
+        <TabunganTable
+          rows={rows}
+          months={months}
+          topTotal={stats.tertinggi?.total ?? 0}
+        />
+      </Reveal>
     </div>
   );
 }

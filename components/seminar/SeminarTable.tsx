@@ -1,5 +1,11 @@
 import { Fragment } from "react";
 import { Check, X } from "lucide-react";
+import {
+  AnimatedBar,
+  CountUp,
+  Reveal,
+  staggerDelay,
+} from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 import {
   formatPct,
@@ -57,20 +63,21 @@ function StatusBadge({
   );
 }
 
-function TotalCell({ total }: { total: number }) {
+function TotalCell({ total, delay = 0 }: { total: number; delay?: number }) {
   const tone = progressTone(total);
-  const width = Math.max(0, Math.min(total, 100));
 
   return (
     <div className="flex min-w-[8.5rem] items-center gap-2">
       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
-        <div
+        <AnimatedBar
+          percent={total}
+          delay={delay}
+          duration={0.8}
           className={`h-full rounded-full ${TONE_BAR[tone]}`}
-          style={{ width: `${width}%` }}
         />
       </div>
       <span className={`w-14 text-right text-xs font-semibold tabular-nums ${TONE_TEXT[tone]}`}>
-        {formatPct(total)}
+        <CountUp value={formatPct(total)} duration={0.8} delay={delay} />
       </span>
     </div>
   );
@@ -78,6 +85,7 @@ function TotalCell({ total }: { total: number }) {
 
 export function SeminarTable({ rows }: SeminarTableProps) {
   const groups = groupByMonth(rows);
+  let rowIndex = -1;
 
   return (
     <GlassCard title="Statistik per Bulan & Pekan" className="!p-4">
@@ -100,35 +108,41 @@ export function SeminarTable({ rows }: SeminarTableProps) {
             <tbody>
               {groups.map((group) => (
                 <Fragment key={group.bulan}>
-                  <tr>
+                  <Reveal as="tr" variant="fade" delay={staggerDelay(++rowIndex, 0.04, 0.1, 14)}>
                     <td colSpan={5} className="px-3 pt-4 pb-1">
                       <p className="text-xs font-semibold tracking-[0.16em] text-sky-300 uppercase">
                         {group.bulan}
                       </p>
                     </td>
-                  </tr>
-                  {group.rows.map((row, index) => (
-                    <tr
-                      key={`${group.bulan}-${row.pekan}-${index}`}
-                      className="bg-slate-900/60"
-                    >
-                      <td className="rounded-l-xl px-3 py-2.5 text-sm font-medium text-white">
-                        {row.pekan || "—"}
-                      </td>
-                      <td className="px-3 py-2.5 text-center">
-                        <StatusBadge label="WET" active={row.wet} />
-                      </td>
-                      <td className="px-3 py-2.5 text-center">
-                        <StatusBadge label="WTT" active={row.wtt} />
-                      </td>
-                      <td className="px-3 py-2.5 text-center">
-                        <StatusBadge label="Podcast" active={row.podcast} />
-                      </td>
-                      <td className="rounded-r-xl px-3 py-2.5">
-                        <TotalCell total={row.total} />
-                      </td>
-                    </tr>
-                  ))}
+                  </Reveal>
+                  {group.rows.map((row, index) => {
+                    const delay = staggerDelay(++rowIndex, 0.04, 0.1, 14);
+                    return (
+                      <Reveal
+                        as="tr"
+                        key={`${group.bulan}-${row.pekan}-${index}`}
+                        variant="fade"
+                        delay={delay}
+                        className="data-row bg-slate-900/60"
+                      >
+                        <td className="rounded-l-xl px-3 py-2.5 text-sm font-medium text-white">
+                          {row.pekan || "—"}
+                        </td>
+                        <td className="px-3 py-2.5 text-center">
+                          <StatusBadge label="WET" active={row.wet} />
+                        </td>
+                        <td className="px-3 py-2.5 text-center">
+                          <StatusBadge label="WTT" active={row.wtt} />
+                        </td>
+                        <td className="px-3 py-2.5 text-center">
+                          <StatusBadge label="Podcast" active={row.podcast} />
+                        </td>
+                        <td className="rounded-r-xl px-3 py-2.5">
+                          <TotalCell total={row.total} delay={delay + 0.15} />
+                        </td>
+                      </Reveal>
+                    );
+                  })}
                 </Fragment>
               ))}
             </tbody>

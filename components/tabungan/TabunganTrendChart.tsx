@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { TrendingUp } from "lucide-react";
+import { useTvMode } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 import {
   formatRupiah,
@@ -26,6 +27,7 @@ interface TabunganTrendChartProps {
 const subscribeNoop = () => () => {};
 
 export function TabunganTrendChart({ data }: TabunganTrendChartProps) {
+  const tv = useTvMode();
   const mounted = useSyncExternalStore(
     subscribeNoop,
     () => true,
@@ -99,7 +101,10 @@ export function TabunganTrendChart({ data }: TabunganTrendChartProps) {
                 fill="url(#tabunganBar)"
                 radius={[6, 6, 0, 0]}
                 maxBarSize={36}
-                isAnimationActive={false}
+                isAnimationActive={!tv}
+                animationBegin={200}
+                animationDuration={900}
+                animationEasing="ease-out"
               />
               <Line
                 type="monotone"
@@ -109,7 +114,10 @@ export function TabunganTrendChart({ data }: TabunganTrendChartProps) {
                 strokeWidth={2.5}
                 dot={{ r: 3.5, fill: "#A3E635", strokeWidth: 0 }}
                 activeDot={{ r: 5 }}
-                isAnimationActive={false}
+                isAnimationActive={!tv}
+                animationBegin={600}
+                animationDuration={1100}
+                animationEasing="ease-out"
               />
             </ComposedChart>
           </ResponsiveContainer>

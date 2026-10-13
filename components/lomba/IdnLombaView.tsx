@@ -16,6 +16,7 @@ import {
   uniqueSorted,
   type LombaFilters,
 } from "@/lib/lomba";
+import { CountUp, Reveal } from "@/components/Animate";
 import { LombaFilterBar } from "./LombaFilterBar";
 import { LombaJenjangChart } from "./LombaJenjangChart";
 import { LombaLeaderboard } from "./LombaLeaderboard";
@@ -78,8 +79,8 @@ export function IdnLombaView({
   }
 
   return (
-    <div className="lomba-board flex h-full flex-col gap-3 overflow-y-auto xl:h-[calc(100vh-100px)] xl:max-h-screen xl:overflow-hidden">
-      <div className="shrink-0 space-y-3">
+    <div className="lomba-board flex flex-col gap-5 pb-8 lg:gap-6 lg:pr-12 lg:pb-10">
+      <div className="shrink-0 space-y-4">
         {error ? (
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-xs text-amber-200 sm:text-sm">
             {error}
@@ -94,11 +95,14 @@ export function IdnLombaView({
           onReset={() => setFilters(DEFAULT_LOMBA_FILTERS)}
         />
 
-        <div className="flex items-center justify-between gap-3 text-xs text-slate-400">
+        <Reveal
+          variant="fade"
+          className="flex items-center justify-between gap-3 text-xs text-slate-400"
+        >
           <p>
             Menampilkan{" "}
-            <span className="font-semibold text-amber-300">
-              {filtered.length}
+            <span className="font-semibold text-amber-300 tabular-nums">
+              <CountUp value={filtered.length} duration={0.6} delay={0} />
             </span>{" "}
             dari {data.length} entri{" "}
             {connected ? (
@@ -112,35 +116,35 @@ export function IdnLombaView({
               <>(mock · fallback)</>
             )}
           </p>
-        </div>
+        </Reveal>
 
         <LombaStatCards stats={stats} />
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 xl:grid-cols-12 xl:items-stretch">
-        <div className="min-h-[420px] xl:min-h-0 xl:h-full xl:col-span-3">
+      <div className="lomba-mid grid grid-cols-1 items-stretch gap-4 xl:grid-cols-12">
+        <Reveal delay={0.2} className="min-h-[320px] xl:col-span-3">
           <LombaSpotlight student={spotlight} />
-        </div>
+        </Reveal>
 
-        <div className="min-h-[420px] xl:min-h-0 xl:h-full xl:col-span-5">
+        <Reveal delay={0.28} className="min-h-[320px] xl:col-span-5">
           <LombaLeaderboard items={leaderboard} />
-        </div>
+        </Reveal>
 
-        <div className="lomba-chart-col flex min-h-0 h-full flex-col gap-3 xl:col-span-4">
-          <div className="min-h-0 flex-1">
+        <div className="lomba-chart-col flex min-h-0 flex-col gap-4 xl:col-span-4">
+          <Reveal delay={0.36} className="flex min-h-0 flex-col">
             <LombaSkalaChart data={skalaChart} />
-          </div>
-          <div className="min-h-0 flex-1">
+          </Reveal>
+          <Reveal delay={0.44} className="flex min-h-0 flex-col">
             <LombaJenjangChart
               data={jenjangChart}
               online={pelaksanaan.online}
               offline={pelaksanaan.offline}
             />
-          </div>
+          </Reveal>
         </div>
       </div>
 
-      <div className="lomba-status-band shrink-0 xl:h-[clamp(210px,27vh,300px)]">
+      <div className="lomba-status-band shrink-0">
         <LombaStatusCards groups={statusGroups} />
       </div>
     </div>

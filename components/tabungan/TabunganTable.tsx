@@ -1,4 +1,5 @@
 import { Table2 } from "lucide-react";
+import { CountUp, Reveal, staggerDelay } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 import { formatRupiah } from "@/lib/tabungan";
 import {
@@ -20,7 +21,7 @@ export function TabunganTable({ rows, months, topTotal }: TabunganTableProps) {
       action={
         <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
           <Table2 className="h-4 w-4 text-yellow-300" />
-          {rows.length.toLocaleString("id-ID")} siswa
+          <CountUp value={rows.length} duration={0.6} delay={0} /> siswa
         </span>
       }
       className="!p-4"
@@ -48,12 +49,15 @@ export function TabunganTable({ rows, months, topTotal }: TabunganTableProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {rows.map((row) => {
+              {rows.map((row, index) => {
                 const isTop = topTotal > 0 && row.total === topTotal;
                 return (
-                  <tr
+                  <Reveal
+                    as="tr"
                     key={`${row.no}-${row.nama}`}
-                    className="transition-colors hover:bg-white/[0.04]"
+                    variant="fade"
+                    delay={staggerDelay(index, 0.035, 0.1, 14)}
+                    className="data-row"
                   >
                     <td className="px-3 py-2.5 text-slate-500 tabular-nums">
                       {row.no}
@@ -87,7 +91,7 @@ export function TabunganTable({ rows, months, topTotal }: TabunganTableProps) {
                         {formatRupiah(row.total)}
                       </span>
                     </td>
-                  </tr>
+                  </Reveal>
                 );
               })}
             </tbody>

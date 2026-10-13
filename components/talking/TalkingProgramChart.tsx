@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { PieChart as PieIcon } from "lucide-react";
 import type { ProgramSlice } from "@/lib/talking";
+import { CountUp, Reveal, staggerDelay, useTvMode } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 
 interface TalkingProgramChartProps {
@@ -17,6 +18,7 @@ interface TalkingProgramChartProps {
 }
 
 export function TalkingProgramChart({ data }: TalkingProgramChartProps) {
+  const tv = useTvMode();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -48,7 +50,10 @@ export function TalkingProgramChart({ data }: TalkingProgramChartProps) {
                     outerRadius={72}
                     paddingAngle={3}
                     stroke="rgba(15,23,42,0.8)"
-                    isAnimationActive={false}
+                    isAnimationActive={!tv}
+                    animationBegin={200}
+                    animationDuration={900}
+                    animationEasing="ease-out"
                   >
                     {data.map((entry) => (
                       <Cell key={entry.name} fill={entry.color} />
@@ -74,10 +79,14 @@ export function TalkingProgramChart({ data }: TalkingProgramChartProps) {
             ) : null}
           </div>
           <ul className="flex w-full flex-col gap-2 sm:w-1/2">
-            {data.map((slice) => (
-              <li
+            {data.map((slice, index) => (
+              <Reveal
+                as="li"
                 key={slice.name}
-                className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                interactive
+                variant="left"
+                delay={staggerDelay(index, 0.08, 0.3)}
+                className="chart-legend-row flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
               >
                 <span className="inline-flex items-center gap-2 text-slate-200">
                   <span
@@ -86,8 +95,14 @@ export function TalkingProgramChart({ data }: TalkingProgramChartProps) {
                   />
                   {slice.name}
                 </span>
-                <span className="font-semibold text-white">{slice.value}</span>
-              </li>
+                <span className="font-semibold text-white tabular-nums">
+                  <CountUp
+                    value={slice.value}
+                    duration={0.8}
+                    delay={staggerDelay(index, 0.08, 0.4)}
+                  />
+                </span>
+              </Reveal>
             ))}
           </ul>
         </div>

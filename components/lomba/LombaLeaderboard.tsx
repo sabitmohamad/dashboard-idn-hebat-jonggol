@@ -1,5 +1,6 @@
 import { Trophy, Users, User } from "lucide-react";
 import type { StudentAchievement } from "@/lib/lomba";
+import { CountUp, Reveal, staggerDelay } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 import { StudentAvatar } from "@/components/StudentAvatar";
 
@@ -29,14 +30,18 @@ export function LombaLeaderboard({ items }: LombaLeaderboardProps) {
           Tidak ada perolehan juara pada filter ini.
         </p>
       ) : (
-        <ul className="lomba-scroll flex max-h-[400px] flex-1 flex-col gap-2 overflow-y-auto pr-1">
+        <ul className="lomba-scroll flex max-h-[28rem] min-h-[16rem] flex-1 flex-col gap-2.5 overflow-y-auto pr-1">
           {items.slice(0, 10).map((item, index) => {
             const rank = index + 1;
             const JenisIcon = item.jenis === "Tim" ? Users : User;
             return (
-              <li
+              <Reveal
+                as="li"
                 key={item.id}
-                className="leaderboard-row flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors"
+                interactive
+                variant="left"
+                delay={staggerDelay(index, 0.05, 0.25)}
+                className="leaderboard-row flex items-center gap-3 rounded-xl border px-3 py-2.5"
               >
                 <span
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${rankTone(rank)}`}
@@ -70,10 +75,16 @@ export function LombaLeaderboard({ items }: LombaLeaderboardProps) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-amber-300">{item.points}</p>
+                  <p className="text-sm font-bold text-amber-300 tabular-nums">
+                    <CountUp
+                      value={item.points}
+                      duration={0.8}
+                      delay={staggerDelay(index, 0.05, 0.35)}
+                    />
+                  </p>
                   <p className="text-[10px] text-slate-500">poin</p>
                 </div>
-              </li>
+              </Reveal>
             );
           })}
         </ul>

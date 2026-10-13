@@ -1,5 +1,6 @@
 import { CheckCircle2, Languages, Mic2, MessagesSquare } from "lucide-react";
 import type { TalkingStats } from "@/lib/talking";
+import { CountUp, Reveal, staggerDelay } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 
 interface TalkingStatCardsProps {
@@ -39,31 +40,36 @@ const CARDS = [
 export function TalkingStatCards({ stats }: TalkingStatCardsProps) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:gap-4">
-      {CARDS.map((card) => {
+      {CARDS.map((card, index) => {
         const Icon = card.icon;
         const done = card.doneKey ? stats[card.doneKey] : 0;
         return (
-          <GlassCard key={card.id} hover className="!p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-medium text-slate-400">{card.label}</p>
-                <p className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                  {stats[card.key].toLocaleString("id-ID")}
-                </p>
-                <p className="mt-1 inline-flex items-center gap-1 text-[10px] text-slate-500">
-                  {card.doneKey ? (
-                    <CheckCircle2 className="h-3 w-3 text-emerald-400" />
-                  ) : null}
-                  {card.hint(done)}
-                </p>
+          <Reveal key={card.id} delay={staggerDelay(index, 0.08)}>
+            <GlassCard hover className="h-full !p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium text-slate-400">{card.label}</p>
+                  <p className="mt-2 text-2xl font-bold tracking-tight text-white tabular-nums sm:text-3xl">
+                    <CountUp
+                      value={stats[card.key]}
+                      delay={staggerDelay(index, 0.08, 0.2)}
+                    />
+                  </p>
+                  <p className="mt-1 inline-flex items-center gap-1 text-[10px] text-slate-500">
+                    {card.doneKey ? (
+                      <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                    ) : null}
+                    {card.hint(done)}
+                  </p>
+                </div>
+                <div
+                  className={`stat-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-gradient-to-br ${card.accent}`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
               </div>
-              <div
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-gradient-to-br ${card.accent}`}
-              >
-                <Icon className="h-5 w-5" />
-              </div>
-            </div>
-          </GlassCard>
+            </GlassCard>
+          </Reveal>
         );
       })}
     </div>

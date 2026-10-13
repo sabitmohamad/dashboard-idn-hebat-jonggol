@@ -1,5 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
+import { TabPill } from "@/components/Animate";
 import { NAV_ITEMS } from "@/lib/nav";
 import { getTheme } from "@/lib/themes";
 import type { MenuId } from "@/lib/types";
@@ -46,32 +48,37 @@ export function BottomNav({ active, onChange }: BottomNavProps) {
               const labels = NAV_LABELS[item.id];
 
               return (
-                <button
+                <motion.button
                   key={item.id}
                   type="button"
                   onClick={() => onChange(item.id)}
                   title={labels.full}
-                  className={`flex min-w-0 flex-1 basis-0 items-center justify-center rounded-xl px-1.5 py-2.5 text-center text-[10px] font-semibold transition-all duration-300 sm:px-2 sm:text-xs md:text-sm ${
+                  whileHover={isActive ? { scale: 1.03 } : { y: -3, scale: 1.04 }}
+                  whileTap={{ scale: 0.94 }}
+                  transition={{ type: "spring", stiffness: 480, damping: 28 }}
+                  className={`relative flex min-w-0 flex-1 basis-0 items-center justify-center rounded-xl px-1.5 py-2.5 text-center text-[10px] font-semibold transition-colors duration-300 sm:px-2 sm:text-xs md:text-sm ${
                     isActive
                       ? "text-white"
                       : "text-slate-300 hover:bg-white/5 hover:text-white"
                   }`}
-                  style={
-                    isActive
-                      ? {
-                          background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`,
-                          boxShadow: `0 4px 20px rgba(${theme.primaryRgb}, 0.5)`,
-                        }
-                      : undefined
-                  }
                 >
-                  <span className="block truncate leading-tight lg:hidden">
+                  {isActive ? (
+                    <TabPill
+                      layoutId="bottom-nav-active"
+                      className="rounded-xl"
+                      style={{
+                        background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`,
+                        boxShadow: `0 4px 20px rgba(${theme.primaryRgb}, 0.5)`,
+                      }}
+                    />
+                  ) : null}
+                  <span className="relative z-10 block truncate leading-tight lg:hidden">
                     {labels.short}
                   </span>
-                  <span className="hidden truncate leading-tight lg:block">
+                  <span className="relative z-10 hidden truncate leading-tight lg:block">
                     {labels.full}
                   </span>
-                </button>
+                </motion.button>
               );
             })}
           </div>

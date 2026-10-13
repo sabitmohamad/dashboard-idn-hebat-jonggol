@@ -1,5 +1,6 @@
 import { Crown } from "lucide-react";
 import type { RekapSiswaMengajar } from "@/src/data/mockMengajar";
+import { CountUp, Reveal, staggerDelay } from "@/components/Animate";
 import { GlassCard } from "@/components/GlassCard";
 import { StudentAvatar } from "@/components/StudentAvatar";
 
@@ -40,9 +41,13 @@ export function MengajarLeaderboard({ items }: MengajarLeaderboardProps) {
           {items.map((item, index) => {
             const rank = index + 1;
             return (
-              <li
+              <Reveal
+                as="li"
                 key={item.id}
-                className={`leaderboard-row flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${rowTone(rank)}`}
+                interactive
+                variant="left"
+                delay={staggerDelay(index, 0.05, 0.25)}
+                className={`leaderboard-row flex items-center gap-3 rounded-xl border px-3 py-2.5 ${rowTone(rank)}`}
               >
                 <span
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${rankTone(rank)}`}
@@ -60,12 +65,16 @@ export function MengajarLeaderboard({ items }: MengajarLeaderboardProps) {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-cyan-300">
-                    {item.totalMengajar}
+                  <p className="text-sm font-bold text-cyan-300 tabular-nums">
+                    <CountUp
+                      value={item.totalMengajar}
+                      duration={0.8}
+                      delay={staggerDelay(index, 0.05, 0.35)}
+                    />
                   </p>
                   <p className="text-[10px] text-slate-500">sesi</p>
                 </div>
-              </li>
+              </Reveal>
             );
           })}
         </ul>

@@ -32,6 +32,8 @@ body {
 
 /* Ambient background glow — driven by active menu theme */
 .dashboard-bg {
+  position: relative;
+  isolation: isolate;
   background:
     radial-gradient(
       ellipse 80% 50% at 20% -10%,
@@ -52,6 +54,52 @@ body {
   transition: background 0.5s ease;
 }
 
+.dashboard-bg::before,
+.dashboard-bg::after {
+  content: "";
+  position: fixed;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(8px);
+}
+
+.dashboard-bg::before {
+  width: 28rem;
+  height: 28rem;
+  left: -8rem;
+  top: -5rem;
+  background: radial-gradient(
+    circle,
+    rgba(var(--theme-primary-rgb), 0.2),
+    transparent 70%
+  );
+  animation: orb-drift 18s ease-in-out infinite;
+}
+
+.dashboard-bg::after {
+  width: 24rem;
+  height: 24rem;
+  right: -6rem;
+  bottom: 12%;
+  background: radial-gradient(
+    circle,
+    rgba(var(--theme-secondary-rgb), 0.16),
+    transparent 70%
+  );
+  animation: orb-drift 22s ease-in-out infinite reverse;
+}
+
+@keyframes orb-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(36px, 28px) scale(1.08);
+  }
+}
+
 .glass-card {
   background: rgba(15, 23, 42, 0.7);
   border: 1px solid var(--glass-border);
@@ -69,16 +117,59 @@ body {
 .glass-card-hover {
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
 .glass-card-hover:hover {
-  border-color: rgba(var(--theme-primary-rgb), 0.45);
+  border-color: rgba(var(--theme-primary-rgb), 0.5);
   box-shadow:
-    0 0 0 1px rgba(var(--theme-primary-rgb), 0.1),
-    0 12px 40px rgba(0, 0, 0, 0.4),
-    0 0 50px rgba(var(--theme-primary-rgb), 0.14);
+    0 0 0 1px rgba(var(--theme-primary-rgb), 0.12),
+    0 16px 44px rgba(0, 0, 0, 0.42),
+    0 0 56px rgba(var(--theme-primary-rgb), 0.2);
+}
+
+/* Light sweep when hovering a stat / class card */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 36%,
+    rgba(255, 255, 255, 0.07) 48%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.07) 52%,
+    transparent 64%
+  );
+  transform: translateX(-130%);
+  pointer-events: none;
+}
+
+.card-shine:hover::after {
+  animation: card-shine 0.75s ease-out;
+}
+
+@keyframes card-shine {
+  to {
+    transform: translateX(130%);
+  }
+}
+
+/* Icon badge inside stat cards nudges when the card is hovered */
+.stat-icon {
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease;
+}
+
+.glass-card-hover:hover .stat-icon {
+  transform: scale(1.1) rotate(-4deg);
+  box-shadow: 0 0 20px rgba(var(--theme-primary-rgb), 0.3);
 }
 
 .leaderboard-row,
@@ -86,10 +177,169 @@ body {
 .side-panel-row {
   border-color: rgba(var(--theme-primary-rgb), 0.12);
   background: rgba(30, 41, 59, 0.4);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.leaderboard-row:hover {
+.leaderboard-row:hover,
+.side-panel-row:hover,
+.chart-legend-row:hover {
   border-color: rgba(var(--theme-primary-rgb), 0.35);
+  background: rgba(30, 41, 59, 0.6);
+  transform: translateX(4px);
+}
+
+/* Interactive table rows */
+.data-row {
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.data-row:hover {
+  background-color: rgba(var(--theme-primary-rgb), 0.1) !important;
+  box-shadow: inset 3px 0 0 rgba(var(--theme-primary-rgb), 0.8);
+}
+
+/* Filter / search fields */
+.interactive-field {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.interactive-field:hover {
+  border-color: rgba(var(--theme-primary-rgb), 0.45);
+  box-shadow: 0 0 0 3px rgba(var(--theme-primary-rgb), 0.1);
+}
+
+.interactive-field:focus {
+  border-color: rgba(var(--theme-primary-rgb), 0.65);
+  box-shadow: 0 0 0 4px rgba(var(--theme-primary-rgb), 0.16);
+}
+
+/* Month / tab chips */
+.motion-chip {
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.motion-chip:hover {
+  transform: translateY(-2px);
+}
+
+/* Press feedback for buttons & tabs */
+.press {
+  transition: transform 0.15s ease;
+}
+
+.press:active {
+  transform: scale(0.96);
+}
+
+/* Soft breathing glow for spotlight panels (opacity only, TV-safe) */
+.spotlight-glow {
+  animation: glow-breathe 4.5s ease-in-out infinite;
+}
+
+@keyframes glow-breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Slow float for hero avatars */
+.float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Shimmer sweep across hero banner */
+.hero-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 48%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.08) 52%,
+    transparent 70%
+  );
+  background-size: 250% 100%;
+  animation: hero-shine 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes hero-shine {
+  0% {
+    background-position: 200% 0;
+  }
+  60%,
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* No pointer on TV, and transforms on chart ancestors must stay off there */
+[data-tv="true"] .glass-card-hover:hover,
+[data-tv="true"] .leaderboard-row:hover,
+[data-tv="true"] .side-panel-row:hover,
+[data-tv="true"] .chart-legend-row:hover,
+[data-tv="true"] .float-slow,
+[data-tv="true"] .motion-chip:hover,
+[data-tv="true"] .dashboard-bg::before,
+[data-tv="true"] .dashboard-bg::after {
+  transform: none;
+  animation: none;
+}
+
+[data-tv="true"] .card-shine::after,
+[data-tv="true"] .dashboard-bg::before,
+[data-tv="true"] .dashboard-bg::after {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-card-hover:hover,
+  .leaderboard-row:hover,
+  .side-panel-row:hover,
+  .chart-legend-row:hover,
+  .glass-card-hover:hover .stat-icon,
+  .press:active,
+  .motion-chip:hover {
+    transform: none;
+  }
+
+  .spotlight-glow,
+  .float-slow,
+  .hero-shine::after,
+  .pulse-dot,
+  .card-shine:hover::after,
+  .dashboard-bg::before,
+  .dashboard-bg::after {
+    animation: none;
+  }
 }
 
 .rank-default {
@@ -216,16 +466,43 @@ body {
 [data-tv="true"] .lomba-board {
   height: 100% !important;
   max-height: 100% !important;
+  gap: 0.5rem !important;
   overflow: hidden !important;
+  padding-bottom: 0 !important;
+}
+
+[data-tv="true"] .lomba-mid {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 [data-tv="true"] .lomba-status-band {
-  height: min(9.5rem, 18vh);
+  height: min(11rem, 22vh);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+[data-tv="true"] .lomba-status-band .glass-card {
+  min-height: 0 !important;
+  height: 100%;
+}
+
+[data-tv="true"] .lomba-status-band ul {
+  max-height: none;
 }
 
 [data-tv="true"] .lomba-chart-col {
   display: grid;
   min-height: 0;
+  height: 100%;
   grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  overflow: hidden;
+}
+
+[data-tv="true"] .lomba-chart-col > *,
+[data-tv="true"] .lomba-chart-col > * > .glass-card {
+  min-height: 0 !important;
+  height: 100%;
   overflow: hidden;
 }
