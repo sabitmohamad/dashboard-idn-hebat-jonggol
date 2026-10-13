@@ -65,7 +65,8 @@ export async function getMenulisData(): Promise<MenulisPayload> {
     const candidates = [
       ...new Set(
         [pickMenulisTab(titles), ...PREFERRED_TABS].filter(
-          (title): title is string => Boolean(title) && titles.includes(title)
+          (title): title is string =>
+            typeof title === "string" && titles.includes(title)
         )
       ),
     ];

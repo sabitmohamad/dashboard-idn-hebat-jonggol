@@ -30,7 +30,7 @@ export function IdnMengajarDashboard({ data }: IdnMengajarDashboardProps) {
   const log = useMemo(() => sortLogTerbaru(data.log), [data.log]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="tv-page flex flex-col gap-4">
       {!data.connected && data.message ? (
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-xs text-amber-200 sm:text-sm">
           {data.message}

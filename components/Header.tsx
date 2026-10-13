@@ -156,7 +156,7 @@ export function Header({
   }, []);
 
   return (
-    <header className="glass-card relative sticky top-0 z-40 rounded-none border-x-0 border-t-0 px-4 py-4 sm:px-6 lg:px-8">
+    <header className="glass-card relative sticky top-0 z-40 shrink-0 rounded-none border-x-0 border-t-0 px-4 py-4 sm:px-6 lg:px-8">
       {/* TV slide progress strip */}
       {tvMode ? (
         <div

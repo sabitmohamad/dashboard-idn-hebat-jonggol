@@ -49,7 +49,7 @@ export function TabunganTrendChart({ data }: TabunganTrendChartProps) {
         </span>
       </div>
 
-      <div className="h-72 w-full sm:h-80">
+      <div className="tv-chart h-72 w-full sm:h-80">
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
@@ -99,6 +99,7 @@ export function TabunganTrendChart({ data }: TabunganTrendChartProps) {
                 fill="url(#tabunganBar)"
                 radius={[6, 6, 0, 0]}
                 maxBarSize={36}
+                isAnimationActive={false}
               />
               <Line
                 type="monotone"
@@ -108,6 +109,7 @@ export function TabunganTrendChart({ data }: TabunganTrendChartProps) {
                 strokeWidth={2.5}
                 dot={{ r: 3.5, fill: "#A3E635", strokeWidth: 0 }}
                 activeDot={{ r: 5 }}
+                isAnimationActive={false}
               />
             </ComposedChart>
           </ResponsiveContainer>

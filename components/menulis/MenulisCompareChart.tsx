@@ -58,7 +58,7 @@ export function MenulisCompareChart({
           Belum ada data kelas.
         </p>
       ) : (
-        <div className="h-72 w-full sm:h-80">
+        <div className="tv-chart h-72 w-full sm:h-80">
           {mounted ? (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -118,6 +118,7 @@ export function MenulisCompareChart({
                   fill={pencapaianColor}
                   radius={[6, 6, 0, 0]}
                   maxBarSize={26}
+                  isAnimationActive={false}
                 />
                 <Bar
                   dataKey="target"
@@ -125,6 +126,7 @@ export function MenulisCompareChart({
                   fill="#475569"
                   radius={[6, 6, 0, 0]}
                   maxBarSize={26}
+                  isAnimationActive={false}
                 />
               </BarChart>
             </ResponsiveContainer>

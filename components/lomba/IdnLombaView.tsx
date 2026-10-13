@@ -78,7 +78,7 @@ export function IdnLombaView({
   }
 
   return (
-    <div className="flex flex-col gap-3 overflow-y-auto xl:h-[calc(100vh-100px)] xl:max-h-screen xl:overflow-hidden">
+    <div className="lomba-board flex h-full flex-col gap-3 overflow-y-auto xl:h-[calc(100vh-100px)] xl:max-h-screen xl:overflow-hidden">
       <div className="shrink-0 space-y-3">
         {error ? (
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-xs text-amber-200 sm:text-sm">
@@ -126,11 +126,11 @@ export function IdnLombaView({
           <LombaLeaderboard items={leaderboard} />
         </div>
 
-        <div className="lomba-scroll flex min-h-0 h-full flex-col gap-3 overflow-y-auto xl:col-span-4">
-          <div className="shrink-0">
+        <div className="lomba-chart-col flex min-h-0 h-full flex-col gap-3 xl:col-span-4">
+          <div className="min-h-0 flex-1">
             <LombaSkalaChart data={skalaChart} />
           </div>
-          <div className="shrink-0 pb-2">
+          <div className="min-h-0 flex-1">
             <LombaJenjangChart
               data={jenjangChart}
               online={pelaksanaan.online}
@@ -140,7 +140,7 @@ export function IdnLombaView({
         </div>
       </div>
 
-      <div className="shrink-0 xl:h-[clamp(210px,27vh,300px)]">
+      <div className="lomba-status-band shrink-0 xl:h-[clamp(210px,27vh,300px)]">
         <LombaStatusCards groups={statusGroups} />
       </div>
     </div>

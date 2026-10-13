@@ -31,14 +31,17 @@ export function LombaJenjangChart({
   }));
 
   return (
-    <GlassCard title="Jenjang Sekolah Target" className="h-full">
+    <GlassCard
+      title="Jenjang Sekolah Target"
+      className="h-full"
+    >
       {total === 0 ? (
         <p className="py-8 text-center text-sm text-slate-400">
           Tidak ada data jenjang sekolah.
         </p>
       ) : (
         <>
-          <div className="h-40 w-full">
+          <div className="h-36 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
                 <XAxis
@@ -67,7 +70,12 @@ export function LombaJenjangChart({
                     fontSize: 12,
                   }}
                 />
-                <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={36}>
+                <Bar
+                  dataKey="value"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={36}
+                  isAnimationActive={false}
+                >
                   {chartData.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}

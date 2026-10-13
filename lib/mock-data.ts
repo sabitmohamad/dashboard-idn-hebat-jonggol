@@ -3,7 +3,6 @@ import type {
   MenuId,
   ProgramDashboardData,
   StudentRank,
-  SummaryDashboardData,
 } from "./types";
 
 function rank(
@@ -240,122 +239,6 @@ export const MOCK_TALKING: ProgramDashboardData = {
       },
     ],
   },
-};
-
-// ─── Summary ─────────────────────────────────────────────────────────────────
-
-export const MOCK_SUMMARY: SummaryDashboardData = {
-  stats: [
-    {
-      id: "prestasi",
-      label: "Total Prestasi Lomba",
-      value: 0,
-      program: "lomba",
-      description: "Memuat data IDN Lomba…",
-    },
-    {
-      id: "jam-mengajar",
-      label: "Total Hari Mengajar",
-      value: 156,
-      program: "mengajar",
-      description: "Hari mengajar di sekolah mitra",
-    },
-    {
-      id: "artikel",
-      label: "Total Artikel",
-      value: 128,
-      program: "menulis",
-      description: "Top writer: Muhammad Al Ghani Izzaldin",
-    },
-    {
-      id: "episode",
-      label: "Total Episode Talking",
-      value: 96,
-      program: "talking",
-      description: "Top speaker: Almer Hadyan Raditya Den",
-    },
-    {
-      id: "seminar",
-      label: "Rata-rata Ketercapaian Seminar",
-      value: "75%",
-      program: "seminar",
-      description: "WET, WTT, dan Podcast per pekan",
-    },
-  ],
-  highlights: [
-    {
-      id: "h1",
-      program: "IDN Lomba",
-      title: "Top Juara",
-      value: "0",
-      accent: "amber",
-    },
-    {
-      id: "h2",
-      program: "IDN Menulis",
-      title: "Al Ghani · Top Writer",
-      value: "24",
-      accent: "emerald",
-    },
-    {
-      id: "h3",
-      program: "IDN Mengajar",
-      title: "Total Hari Mengajar",
-      value: "156",
-      accent: "cyan",
-    },
-    {
-      id: "h4",
-      program: "IDN Talking",
-      title: "Almer · Top Speaker",
-      value: "22",
-      accent: "pink",
-    },
-  ],
-  topPerformers: [
-    {
-      id: "tp1",
-      name: "Rajjah Abqory Yasir",
-      className: getStudent("Rajjah Abqory Yasir").className,
-      categories: ["Talking"],
-      highlight: "YouTube Host · IDN Talking",
-    },
-    {
-      id: "tp2",
-      name: "Muhammad Fathan Ghifari",
-      className: getStudent("Muhammad Fathan Ghifari").className,
-      categories: ["Menulis"],
-      highlight: "Panduan Flutter GetX · 1.8K readers",
-    },
-    {
-      id: "tp3",
-      name: "Ahmad Syafi Multazam",
-      className: getStudent("Ahmad Syafi Multazam").className,
-      categories: ["Menulis"],
-      highlight: "Tips Sertifikasi CCNA · Lifestyle",
-    },
-    {
-      id: "tp4",
-      name: "Almer Hadyan Raditya Den",
-      className: getStudent("Almer Hadyan Raditya Den").className,
-      categories: ["Talking"],
-      highlight: "Top Speaker · Weekly English Talk: AI in Future",
-    },
-    {
-      id: "tp5",
-      name: "Muhammad Al Ghani Izzaldin",
-      className: getStudent("Muhammad Al Ghani Izzaldin").className,
-      categories: ["Menulis"],
-      highlight: "Top Writer · Tutorial Next.js 14",
-    },
-    {
-      id: "tp6",
-      name: "Hazlam Ibad Athaillah",
-      className: getStudent("Hazlam Ibad Athaillah").className,
-      categories: ["Menulis"],
-      highlight: "12 artikel Religion · Active Writer",
-    },
-  ],
 };
 
 export const PROGRAM_MOCK_MAP: Record<

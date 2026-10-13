@@ -36,7 +36,7 @@ export function TalkingProgramChart({ data }: TalkingProgramChartProps) {
         </p>
       ) : (
         <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <div className="h-44 w-full sm:h-48 sm:w-1/2">
+          <div className="tv-chart h-44 w-full sm:h-48 sm:w-1/2">
             {mounted ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -48,6 +48,7 @@ export function TalkingProgramChart({ data }: TalkingProgramChartProps) {
                     outerRadius={72}
                     paddingAngle={3}
                     stroke="rgba(15,23,42,0.8)"
+                    isAnimationActive={false}
                   >
                     {data.map((entry) => (
                       <Cell key={entry.name} fill={entry.color} />

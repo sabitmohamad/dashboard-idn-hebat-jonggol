@@ -74,7 +74,7 @@ export function MengajarMateriChart({ data }: MengajarMateriChartProps) {
                 }}
                 labelStyle={{ color: "#fff", fontWeight: 600 }}
               />
-              <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={22}>
+              <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={22} isAnimationActive={false}>
                 {data.map((entry) => (
                   <Cell key={entry.name} fill={entry.color} />
                 ))}

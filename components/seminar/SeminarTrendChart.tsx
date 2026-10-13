@@ -56,7 +56,7 @@ export function SeminarTrendChart({ data }: SeminarTrendChartProps) {
         </span>
       </div>
 
-      <div className="h-72 w-full sm:h-80">
+      <div className="tv-chart h-72 w-full sm:h-80">
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
@@ -105,6 +105,7 @@ export function SeminarTrendChart({ data }: SeminarTrendChartProps) {
                 name="Rata-rata ketercapaian"
                 radius={[6, 6, 0, 0]}
                 maxBarSize={36}
+                isAnimationActive={false}
               >
                 {data.map((point) => (
                   <Cell key={point.bulan} fill={barColor(point.rataRata)} />
@@ -120,6 +121,7 @@ export function SeminarTrendChart({ data }: SeminarTrendChartProps) {
                 activeDot={{ r: 5 }}
                 legendType="none"
                 tooltipType="none"
+                isAnimationActive={false}
               />
             </ComposedChart>
           </ResponsiveContainer>

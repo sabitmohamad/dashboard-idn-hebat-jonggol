@@ -198,3 +198,34 @@ body {
   background: rgba(59, 130, 246, 0.45);
   border-radius: 999px;
 }
+
+/*
+ * TV autoplay does not scroll. Keep charts inside the first screen and
+ * avoid CSS filters/transforms on chart ancestors (those leave SVG blank).
+ */
+[data-tv="true"] .tv-page {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+[data-tv="true"] .tv-chart {
+  height: min(13rem, 24vh) !important;
+}
+
+[data-tv="true"] .lomba-board {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+[data-tv="true"] .lomba-status-band {
+  height: min(9.5rem, 18vh);
+}
+
+[data-tv="true"] .lomba-chart-col {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  overflow: hidden;
+}

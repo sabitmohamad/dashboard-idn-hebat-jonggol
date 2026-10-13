@@ -18,8 +18,8 @@ export function LombaSkalaChart({ data }: LombaSkalaChartProps) {
           Tidak ada data skala kompetisi.
         </p>
       ) : (
-        <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <div className="relative h-40 w-40 shrink-0">
+        <div className="flex min-h-0 flex-1 flex-col items-center gap-3 sm:flex-row">
+          <div className="lomba-chart-plot relative h-32 w-32 shrink-0 sm:h-36 sm:w-36">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -28,10 +28,11 @@ export function LombaSkalaChart({ data }: LombaSkalaChartProps) {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius={44}
-                  outerRadius={64}
+                  innerRadius={36}
+                  outerRadius={52}
                   paddingAngle={3}
                   stroke="transparent"
+                  isAnimationActive={false}
                 >
                   {data.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />

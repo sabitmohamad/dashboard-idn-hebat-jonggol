@@ -12,21 +12,8 @@ import { IdnSeminarDashboard } from "@/components/seminar/IdnSeminarDashboard";
 import { IdnTabunganDashboard } from "@/components/tabungan/IdnTabunganDashboard";
 import { IdnTalkingDashboard } from "@/components/talking/IdnTalkingDashboard";
 import { SummaryView } from "@/components/SummaryView";
-import {
-  buildMengajarLeaderboard,
-  computeMengajarStats,
-} from "@/lib/mengajar";
-import {
-  bestAchievementFor,
-  buildLeaderboard,
-  computeLombaStats,
-  getSpotlightStudent,
-  groupLombaByStatus,
-} from "@/lib/lomba";
-import { computeMenulisStats, formatNum, formatPct } from "@/lib/menulis";
-import { computeSeminarStats, formatPct as formatSeminarPct } from "@/lib/seminar";
-import { MOCK_SUMMARY } from "@/lib/mock-data";
 import { NAV_ITEMS } from "@/lib/nav";
+import { buildSummary } from "@/lib/summary";
 import { getTheme, themeCssVars } from "@/lib/themes";
 import type { LombaItem } from "@/src/data/mockLomba";
 import { MOCK_LOMBA_DATA } from "@/src/data/mockLomba";
@@ -50,11 +37,7 @@ import {
   EMPTY_TABUNGAN_PAYLOAD,
   type TabunganPayload,
 } from "@/src/data/tabungan";
-import type {
-  MenuId,
-  SummaryDashboardData,
-  SummaryTopPerformer,
-} from "@/lib/types";
+import type { MenuId } from "@/lib/types";
 
 const TV_SLIDE_MS = 10_000;
 const TV_SLIDE_SECONDS = TV_SLIDE_MS / 1000;
@@ -63,154 +46,6 @@ function nextMenuId(current: MenuId): MenuId {
   const idx = NAV_ITEMS.findIndex((item) => item.id === current);
   const next = NAV_ITEMS[(idx + 1 + NAV_ITEMS.length) % NAV_ITEMS.length];
   return next.id;
-}
-
-function withMengajarSummary(
-  base: SummaryDashboardData,
-  mengajar: MengajarPayload
-): SummaryDashboardData {
-  const stats = computeMengajarStats(mengajar.rekap, mengajar.log);
-  const top = buildMengajarLeaderboard(mengajar.rekap)[0];
-
-  return {
-    ...base,
-    stats: base.stats.map((stat) =>
-      stat.program === "mengajar"
-        ? {
-            ...stat,
-            label: "Total Sesi Mengajar",
-            value: stats.totalSesi,
-            description: `${stats.totalSekolah} sekolah mitra · ${stats.totalPeserta.toLocaleString("id-ID")} peserta didik luar`,
-          }
-        : stat
-    ),
-    highlights: base.highlights.map((item) =>
-      item.program === "IDN Mengajar" && top
-        ? {
-            ...item,
-            title: `${top.nama.split(" ")[0]} · Top Pengajar`,
-            value: String(top.totalMengajar),
-          }
-        : item
-    ),
-  };
-}
-
-function withMenulisSummary(
-  base: SummaryDashboardData,
-  menulis: MenulisPayload
-): SummaryDashboardData {
-  const stats = computeMenulisStats(menulis);
-  const top = stats.topMenulis;
-
-  return {
-    ...base,
-    stats: base.stats.map((stat) =>
-      stat.program === "menulis"
-        ? {
-            ...stat,
-            label: "Total Halaman Menulis",
-            value: stats.totalPencapaianMenulis,
-            description: `${formatPct(stats.persenMenulis)} dari target ${formatNum(stats.totalTargetMenulis)} hlm · ${formatNum(stats.totalPencapaianSertifikat)} sertifikat`,
-          }
-        : stat
-    ),
-    highlights: base.highlights.map((item) =>
-      item.program === "IDN Menulis" && top
-        ? {
-            ...item,
-            title: `Kelas ${top.kelas} · Top Menulis`,
-            value: formatNum(top.pencapaian),
-          }
-        : item
-    ),
-  };
-}
-
-function withSeminarSummary(
-  base: SummaryDashboardData,
-  seminar: SeminarPayload
-): SummaryDashboardData {
-  const stats = computeSeminarStats(seminar.data);
-
-  return {
-    ...base,
-    stats: base.stats.map((stat) =>
-      stat.program === "seminar"
-        ? {
-            ...stat,
-            label: "Rata-rata Ketercapaian Seminar",
-            value: formatSeminarPct(stats.rataRata),
-            description: `${stats.pekanSelesai} pekan selesai 100% · ${stats.totalPekan} pekan`,
-          }
-        : stat
-    ),
-  };
-}
-
-function withLombaSummary(
-  base: SummaryDashboardData,
-  lomba: LombaItem[]
-): SummaryDashboardData {
-  const stats = computeLombaStats(lomba);
-  const groups = groupLombaByStatus(lomba);
-  const leaderboard = buildLeaderboard(lomba);
-  const top = getSpotlightStudent(leaderboard);
-
-  const lombaPerformers: SummaryTopPerformer[] = leaderboard
-    .slice(0, 3)
-    .map((student) => {
-      const best = bestAchievementFor(lomba, student.id);
-      const highlight = best
-        ? `Juara ${best.peringkat} · ${best.nama_lomba} (${best.tingkat_lomba}) · ${student.points} poin`
-        : `${student.totalJuara} perolehan juara · ${student.points} poin`;
-      return {
-        id: `lomba-${student.id}`,
-        name: student.name,
-        className: student.className,
-        categories: ["Lomba"],
-        highlight,
-      };
-    });
-
-  const baseOthers = (base.topPerformers ?? []).filter(
-    (p) => !lombaPerformers.some((l) => l.name === p.name)
-  );
-  const merged = lombaPerformers.map((l) => {
-    const other = base.topPerformers?.find((p) => p.name === l.name);
-    if (!other) return l;
-    return {
-      ...l,
-      categories: ["Lomba", ...other.categories.filter((c) => c !== "Lomba")],
-      highlight: `${l.highlight} · ${other.highlight}`,
-    };
-  });
-
-  return {
-    ...base,
-    stats: base.stats.map((stat) =>
-      stat.program === "lomba"
-        ? {
-            ...stat,
-            label: "Total Prestasi Lomba",
-            value: stats.totalKejuaraan,
-            description: `${groups.Pendaftaran.length} pendaftaran · ${groups.Pelaksanaan.length} pelaksanaan · ${groups.Selesai.length} selesai${top ? ` — dipimpin ${top.name}` : ""}`,
-          }
-        : stat
-    ),
-    highlights: base.highlights.map((item) =>
-      item.program === "IDN Lomba"
-        ? top
-          ? {
-              ...item,
-              title: `${top.name.split(" ")[0]} · Top Juara`,
-              value: String(top.totalJuara),
-            }
-          : { ...item, title: "Belum ada juara", value: "0" }
-        : item
-    ),
-    topPerformers: [...merged, ...baseOthers],
-  };
 }
 
 export default function HomePage() {
@@ -520,17 +355,14 @@ export default function HomePage() {
 
   const summaryData = useMemo(
     () =>
-      withLombaSummary(
-        withSeminarSummary(
-          withMenulisSummary(
-            withMengajarSummary(MOCK_SUMMARY, mengajarData),
-            menulisData
-          ),
-          seminarData
-        ),
-        lombaData
-      ),
-    [mengajarData, menulisData, seminarData, lombaData]
+      buildSummary({
+        mengajar: mengajarData,
+        lomba: { data: lombaData, connected: lombaConnected },
+        talking: talkingData,
+        menulis: menulisData,
+        seminar: seminarData,
+      }),
+    [mengajarData, lombaData, lombaConnected, talkingData, menulisData, seminarData]
   );
 
   const theme = getTheme(activeMenu);
@@ -567,8 +399,11 @@ export default function HomePage() {
 
   return (
     <div
-      className="dashboard-bg min-h-screen pb-8 text-white"
+      className={`dashboard-bg text-white ${
+        tvMode ? "flex h-dvh flex-col overflow-hidden" : "min-h-screen pb-8"
+      }`}
       data-theme={activeMenu}
+      data-tv={tvMode ? "true" : undefined}
       style={themeCssVars(theme)}
     >
       <Header
@@ -583,7 +418,11 @@ export default function HomePage() {
         onToggleFullscreen={toggleFullscreen}
       />
 
-      <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
+      <main
+        className={`mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8 ${
+          tvMode ? "min-h-0 flex-1 overflow-hidden py-3" : "py-6"
+        }`}
+      >
         {(loading && activeMenu === "mengajar") ||
         (lombaLoading && activeMenu === "lomba") ||
         (talkingLoading && activeMenu === "talking") ||
@@ -595,10 +434,11 @@ export default function HomePage() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeMenu}
-              initial={{ opacity: 0, x: 28, filter: "blur(6px)" }}
-              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, x: -22, filter: "blur(6px)" }}
-              transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+              className={tvMode ? "h-full min-h-0" : undefined}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
               {activeMenu === "summary" ? (
                 <SummaryView data={summaryData} />

@@ -31,6 +31,7 @@ export function StatusChart({
                 outerRadius={70}
                 paddingAngle={3}
                 stroke="transparent"
+                isAnimationActive={false}
               >
                 {data.map((entry) => (
                   <Cell key={entry.name} fill={entry.color} />
